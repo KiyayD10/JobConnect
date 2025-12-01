@@ -52,3 +52,12 @@ enum Role {
   EMPLOYER
   ADMIN
 }
+
+// Enum untuk tipe pekerjaan
+enum JobType {
+  FULLTIME
+  PARTTIME
+  CONTRACT
+  FREELANCE
+  INTERNSHIP
+}
