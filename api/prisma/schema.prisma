@@ -26,3 +26,22 @@ model User {
 
   @@map("users")
 }
+
+// Job Model - untuk list pekerjaan
+model Job {
+  id           String   @id @default(cuid())
+  title        String
+  company      String
+  location     String
+  type         JobType  @default(FULLTIME)
+  salary       String?
+  description  String   @db.Text
+  requirements String   @db.Text
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@map("jobs")
+}
