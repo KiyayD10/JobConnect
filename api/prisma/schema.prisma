@@ -45,3 +45,10 @@ model Job {
   @@index([userId])
   @@map("jobs")
 }
+
+// Enum untuk role user
+enum Role {
+  JOBSEEKER
+  EMPLOYER
+  ADMIN
+}
