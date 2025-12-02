@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma"
-import { hashPassword } from "@/lib/auth"
+import { hashPassword, generateToken } from "@/lib/auth"
 
-export async function POST(request: NextResponse): Promise<Response> {
+export async function POST(request: NextRequest): Promise<Response> {
     try{
         const body = await request.json()
         const {email, password, name, role} = body
@@ -43,15 +43,52 @@ export async function POST(request: NextResponse): Promise<Response> {
             )
         }
 
-        // Enkripsi password sebelum disimpan
-        const hashedPassword = await hashPassword(password)
+        // Enkripsi password sebelum disimpan (Hashing)
+        const hashedPassword = await hashPassword(password);
 
-        // Simpan user ke DataBase
-        return NextResponse.json({ message: 'User ready to create' })
+        // Simpan user ke database
+        const user = await prisma.user.create({
+            data: {
+                email,
+                password: hashedPassword,
+                name,
+                role: role || 'JOBSEEKER',
+            },
+            // Pilih field yang mau dikembalikan (Password jangan dikirim balik!)
+            select: {
+                id: true,
+                email: true,
+                name: true,
+                role: true,
+                createdAt: true,
+            },
+        })
 
-        // Lanjut ke cek database
-        return NextResponse.json({message: "Validasi berhasil"}, {status: 200})
-    } catch (error) {
-        return NextResponse.json({error: "Terjadi kesalahan"}, {status: 500})
+        // Buat Token (JWT)
+        const token = generateToken({
+            userId: user.id,
+            email: user.email,
+            role: user.role,
+        })
+
+        // Kembalikan data user + token
+        return NextResponse.json(
+            {
+                message: 'Pengguna berhasil terdaftar',
+                user,
+                token,
+            },
+            { status: 201 }
+        )
+
+    } catch (error: unknown) {
+        // Error Handling
+        if (error instanceof Error) {
+            console.error("Registration error:", error.message);
+        }
+        return NextResponse.json(
+            { error: "Internal server error" },
+            { status: 500 }
+        );
     }
 }
