@@ -111,3 +111,53 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         )
     }
 }
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }): Promise<NextResponse> {
+    try {
+        // Cek login
+        const auth = authenticateRequest(request)
+        if (auth.error) {
+            return auth.error
+        }
+        const { user } = auth
+        const { id } = params
+
+        // Cari data lama
+        const existingJob = await prisma.job.findUnique({
+            where: { id },
+        })
+        if (!existingJob) {
+            return NextResponse.json(
+                { error: "Lowongan tidak ditemukan" }, 
+                { status: 404 }
+            )
+        }
+
+        // Cek pemilik
+        const isOwner = existingJob.userId === user.userId
+        const isAdmin = user.role === 'ADMIN'
+
+        if (!isOwner && !isAdmin) {
+            return NextResponse.json(
+                { error: "Anda tidak memiliki izin untuk menghapus lowongan ini" }, 
+                { status: 403 }
+            )
+        }
+
+        // Hapus dari database
+        await prisma.job.delete({
+            where: { id },
+        })
+        return NextResponse.json({ 
+            message: "Lowongan berhasil dihapus",
+        })
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Terjadi kesalahan saat menghapus data pekerjaan:", error.message)
+        }
+        return NextResponse.json(
+            {error: "Terjadi kesalahan pada server"},
+            {status: 500}
+        )
+    }
+}
