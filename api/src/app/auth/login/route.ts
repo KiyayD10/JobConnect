@@ -1,6 +1,6 @@
 import { NextRequest,NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { comparePassword } from "@/lib/auth"
+import { comparePassword, generateToken } from "@/lib/auth"
 
 export async function POST(request: NextRequest): Promise<Response> {
     try {
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest): Promise<Response> {
             )
         }
 
-        // Cari di database
+        // Cari user berdasarkan email
         const user = await prisma.user.findUnique({
             where: { email },
         })
@@ -36,5 +36,37 @@ export async function POST(request: NextRequest): Promise<Response> {
                 {status: 401}
             )
         }
+
+        // Generate JWT token
+        const token = generateToken({ 
+            userId: user.id, 
+            email: user.email, 
+            role: user.role 
+        })
+
+        // Buat object response user tanpa password
+        const userResponse = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+        }
+
+        // Login berhasil
+        return NextResponse.json({ 
+            message: "Login berhasil",
+            user: userResponse, 
+            token,
+        })
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error("Login Gagal:", error.message)
+        }
+        return NextResponse.json(
+            { error: "Terjadi kesalahan pada server" },
+            { status: 500 }
+        )
     }
 }
