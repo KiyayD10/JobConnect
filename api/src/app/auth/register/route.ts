@@ -1,5 +1,6 @@
-import { error } from "console";
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma"
+import { hashPassword } from "@/lib/auth"
 
 export async function POST(request: NextResponse): Promise<Response> {
     try{
@@ -30,6 +31,23 @@ export async function POST(request: NextResponse): Promise<Response> {
                 {status: 400}
             )
         }
+
+        // Cek apakah user sudah ada
+        const exsistingUser = await prisma.user.findUnique({
+            where: { email },
+        })
+        if (exsistingUser) {
+            return NextResponse.json(
+                {error: "Email sudah terdaftar"},
+                {status: 409}
+            )
+        }
+
+        // Enkripsi password sebelum disimpan
+        const hashedPassword = await hashPassword(password)
+
+        // Simpan user ke DataBase
+        return NextResponse.json({ message: 'User ready to create' })
 
         // Lanjut ke cek database
         return NextResponse.json({message: "Validasi berhasil"}, {status: 200})
