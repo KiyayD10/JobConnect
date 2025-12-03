@@ -5,19 +5,15 @@ const globalForPrisma = globalThis as unknown as {
     prisma: PrismaClient | undefined;
 }
 
-const prismaConfig = {
-    datasourceUrl: process.env.Database_URL,
-    log:
-    process.env.NODE_ENV === "development"
-        ? ["query", "error", "warn"]
-        : ["error"],
-};
-
+// Cek global var: Pakai koneksi lama jika ada, atau buat baru (Singleton)
 export const prisma = 
     globalForPrisma.prisma ?? 
-    new PrismaClient(
-        prismaConfig as unknown as ConstructorParameters<typeof PrismaClient>[0]
-    );
+    new PrismaClient({
+        log: 
+        process.env.NODE_ENV === "development"
+            ? ["query", "error", "warn"]
+            : ["error"],
+    });
 
 // Simpan koneksi ke memori global jika sedang coding (bukan production)
 if (process.env.NODE_ENV !== "production") {
