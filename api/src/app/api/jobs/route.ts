@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from '@/lib/prisma'
-import { Prisma, JobType } from "@/generated/prisma"
+import { prisma } from "@/lib/prisma"
+import { Prisma, JobType } from "@prisma/client"
 import { authenticateRequest } from "@/lib/middleware"
 
 // Ambil semua lowongan dengan filter (Search, Location, Type)

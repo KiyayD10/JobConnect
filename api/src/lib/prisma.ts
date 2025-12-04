@@ -1,4 +1,4 @@
-import { PrismaClient } from "@/generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 // Mencegah error "Too many connections" saat hot-reload (Development)
 const globalForPrisma = globalThis as unknown as {
