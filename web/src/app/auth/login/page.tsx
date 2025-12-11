@@ -158,6 +158,21 @@ export default function LoginPage() {
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? "Sedang masuk..." : "Masuk"}
               </Button>
+
+              <div className="text-center text-sm text-muted-foreground">
+                Atau masuk dengan
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Button variant="outline" className="flex gap-2 items-center justify-center">
+                  <GoogleIcon className="w-4 h-4" /> Google
+                </Button>
+
+                <Button variant="outline" className="flex gap-2 items-center justify-center">
+                  <GithubIcon className="w-4 h-4" /> GitHub
+                </Button>
+              </div>
+              
             </form>
           </CardContent>
 
