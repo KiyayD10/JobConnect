@@ -154,7 +154,10 @@ export default function LoginPage() {
                 </a>
               </div>
 
-              
+              {/* submit */}
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? "Sedang masuk..." : "Masuk"}
+              </Button>
             </form>
           </CardContent>
 
