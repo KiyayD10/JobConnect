@@ -112,7 +112,7 @@ export default function LoginPage() {
                 <div className="relative mt-1">
                   <Input
                     id="email"
-                    placeholder="contoh@domain.com"
+                    placeholder="Masukkan email Anda"
                     {...register("email")}
                     className={cn("pl-10", errors.email && "border-destructive")}
                   />
@@ -125,7 +125,7 @@ export default function LoginPage() {
                 )}
               </div>
 
-               <div>
+              <div>
                 <Label htmlFor="password">Kata sandi</Label>
                 <div className="relative mt-1">
                   <Input
