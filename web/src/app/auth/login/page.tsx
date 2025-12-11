@@ -184,9 +184,12 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-
             </form>
           </CardContent>
+
+          <CardFooter className="text-center text-xs text-muted-foreground">
+            Dengan masuk, Anda menyetujui Syarat & Ketentuan kami.
+          </CardFooter>
 
         </Card>
       </motion.div>
