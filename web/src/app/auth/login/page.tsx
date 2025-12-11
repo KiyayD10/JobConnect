@@ -142,6 +142,18 @@ export default function LoginPage() {
                 )}
               </div>
 
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="remember" {...register("remember")} />
+                  <Label htmlFor="remember" className="select-none">
+                    Ingat saya
+                  </Label>
+                </div>
+                <a className="text-sm underline-offset-2 hover:underline" href="#">
+                  Lupa kata sandi?
+                </a>
+              </div>
+
               
             </form>
           </CardContent>
