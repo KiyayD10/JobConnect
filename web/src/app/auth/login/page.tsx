@@ -122,6 +122,27 @@ export default function LoginPage() {
                   </p>
                 )}
               </div>
+
+               <div>
+                <Label htmlFor="password">Kata sandi</Label>
+                <div className="relative mt-1">
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Masukkan kata sandi"
+                    {...register("password")}
+                    className={cn("pl-10", errors.password && "border-destructive")}
+                  />
+                  <LockIcon className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
+                </div>
+                {errors.password && (
+                  <p className="text-sm text-destructive mt-1">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+
+              
             </form>
           </CardContent>
 
