@@ -103,6 +103,28 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
 
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <div className="relative mt-1">
+                  <Input
+                    id="email"
+                    placeholder="contoh@domain.com"
+                    {...register("email")}
+                    className={cn("pl-10", errors.email && "border-destructive")}
+                  />
+                  <MailIcon className="w-4 h-4 absolute left-3 top-3 text-muted-foreground" />
+                </div>
+                {errors.email && (
+                  <p className="text-sm text-destructive mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+            </form>
+          </CardContent>
+
         </Card>
       </motion.div>
     </div>
