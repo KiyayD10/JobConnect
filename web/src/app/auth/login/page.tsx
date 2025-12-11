@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
+import Link from "next/link";
+
 
 import {
   Card,
@@ -172,7 +174,17 @@ export default function LoginPage() {
                   <GithubIcon className="w-4 h-4" /> GitHub
                 </Button>
               </div>
+
+              <Separator />
               
+              <div className="text-center text-sm">
+                Belum punya akun?
+                <Link href="/auth/register" className="underline">
+                  Daftar
+                </Link>
+              </div>
+
+
             </form>
           </CardContent>
 
