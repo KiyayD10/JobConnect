@@ -82,7 +82,10 @@ export default function LoginPage() {
     defaultValues: { remember: true },
   });
 
-
+  async function onSubmit(data: LoginSchema) {
+    console.log("submit", data);
+    await new Promise((r) => setTimeout(r, 700));
+  }
 
   return (
     <div>
