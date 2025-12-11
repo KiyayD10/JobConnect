@@ -95,8 +95,15 @@ export default function LoginPage() {
         transition={{ duration: 0.36 }}
         className="w-full max-w-md"
       >
+        <Card className="shadow-lg">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Selamat datang kembali</CardTitle>
+            <CardDescription>
+              Masuk ke akun Anda untuk melanjutkan
+            </CardDescription>
+          </CardHeader>
 
-
+        </Card>
       </motion.div>
     </div>
   );
