@@ -63,6 +63,14 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+const loginSchema = z.object({
+  email: z.string().email({ message: "Masukkan email yang valid" }),
+  password: z.string().min(6, { message: "Minimal 6 karakter" }),
+  remember: z.boolean().optional(),
+});
+
+type LoginSchema = z.infer<typeof loginSchema>;
+
 export default function LoginPage() {
   return (
     <div>
