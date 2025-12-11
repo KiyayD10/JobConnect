@@ -88,8 +88,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div>
-      <h1>Login Page</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-white p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.36 }}
+        className="w-full max-w-md"
+      >
+
+
+      </motion.div>
     </div>
   );
 }
