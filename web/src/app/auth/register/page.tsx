@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import React from 'react'
+import z from 'zod';
 
 function Header() {
   return (
@@ -19,6 +20,23 @@ function Header() {
     </header>
   );
 }
+
+const registerSchema = z
+  .object({
+    name: z.string().min(3, { message: "Minimal 3 karakter" }),
+    email: z.string().email({ message: "Masukkan email yang valid" }),
+    password: z.string().min(6, { message: "Minimal 6 karakter" }),
+    confirmPassword: z.string().min(6, { message: "Minimal 6 karakter" }),
+    terms: z.boolean().refine((v) => v === true, {
+      message: "Anda harus menyetujui ketentuan",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Kata sandi tidak cocok",
+    path: ["confirmPassword"],
+  });
+
+type RegisterSchema = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   return (
