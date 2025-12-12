@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import React from 'react'
 import z from 'zod';
+import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+
 
 function Header() {
   return (
@@ -39,6 +42,20 @@ const registerSchema = z
 type RegisterSchema = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RegisterSchema>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  async function onSubmit(data: RegisterSchema) {
+    console.log("register", data);
+    await new Promise((r) => setTimeout(r, 800));
+  }
+
   return (
     <div>
       <h1>Register Page</h1>
