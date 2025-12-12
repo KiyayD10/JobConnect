@@ -178,7 +178,7 @@ export default function LoginPage() {
               <Separator />
               
               <div className="text-center text-sm">
-                Belum punya akun?
+                Belum punya akun?{" "}
                 <Link href="/auth/register" className="underline">
                   Daftar
                 </Link>
