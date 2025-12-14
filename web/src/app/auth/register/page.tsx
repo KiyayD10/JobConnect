@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import React from 'react'
-import z from 'zod';
+import { z } from 'zod';
 import { useForm } from "react-hook-form";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from "framer-motion";
@@ -22,23 +22,6 @@ import { Separator } from "@/src/components/ui/separator";
 import { Checkbox } from "@/src/components/ui/checkbox";
 import { cn } from "@/src/lib/utils";
 
-
-function Header() {
-  return (
-    <header className="w-full py-4 px-6 bg-white shadow-sm fixed top-0 left-0 z-50">
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
-        <h1 className="text-xl font-semibold">MyApp</h1>
-
-        <Link
-          href="/auth/login"
-          className="text-sm underline hover:text-blue-600 transition"
-        >
-          Masuk
-        </Link>
-      </div>
-    </header>
-  );
-}
 
 const registerSchema = z
   .object({
@@ -74,10 +57,8 @@ export default function RegisterPage() {
 
    return (
     <>
-      {/* Header */}
-      <Header />
-
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-white p-6 pt-24">
+      
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-white p-6">
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
