@@ -14,7 +14,7 @@ export default function AuthLayout({
           src="/images/logo.png"
           alt="Logo JobConnect"
           width={240}
-          height={80}
+          height={60}
           priority
         />
       </header>
