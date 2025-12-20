@@ -37,4 +37,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false)
     }, [])
 
+    const login = (newToken: string, newUser: User) => {
+    setToken(newToken)
+    setUser(newUser)
+    Cookies.set('token', newToken, { expires: 7 }) // Simpan 7 hari
+    Cookies.set('user', JSON.stringify(newUser), { expires: 7 })
+    router.push('/') // Redirect ke home
+    }
+    
+    const logout = () => {
+    setToken(null)
+    setUser(null)
+    Cookies.remove('token')
+    Cookies.remove('user')
+    router.push('/auth/login')
+    }
+
 }
