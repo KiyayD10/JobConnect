@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from "next/router"
-import { createContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
 import Cookies from 'js-cookie'
 interface User {
     id: string
@@ -31,26 +31,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const storedToken = Cookies.get('token')
     const storedUser = Cookies.get('user')
     if (storedToken && storedUser) {
-    setToken(storedToken)
-    setUser(JSON.parse(storedUser))
+        setToken(storedToken)
+        setUser(JSON.parse(storedUser))
     }
     setIsLoading(false)
     }, [])
 
     const login = (newToken: string, newUser: User) => {
-    setToken(newToken)
-    setUser(newUser)
-    Cookies.set('token', newToken, { expires: 7 }) // Simpan 7 hari
-    Cookies.set('user', JSON.stringify(newUser), { expires: 7 })
-    router.push('/') // Redirect ke home
+        setToken(newToken)
+        setUser(newUser)
+        Cookies.set('token', newToken, { expires: 7 }) // Simpan 7 hari
+        Cookies.set('user', JSON.stringify(newUser), { expires: 7 })
+        router.push('/') // Redirect ke home
     }
-    
+
     const logout = () => {
-    setToken(null)
-    setUser(null)
-    Cookies.remove('token')
-    Cookies.remove('user')
-    router.push('/auth/login')
+        setToken(null)
+        setUser(null)
+        Cookies.remove('token')
+        Cookies.remove('user')
+        router.push('/auth/login')
     }
+
+    return (
+    <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
+    {children}
+    </AuthContext.Provider>
+    )
+    }
+    export const useAuth = () => {
+    const context = useContext(AuthContext)
+    if (!context) throw new Error('useAuth must be used within an AuthProvider')
+    return context
 
 }
