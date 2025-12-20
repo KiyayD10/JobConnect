@@ -1,163 +1,119 @@
-import { prisma } from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
-import { authenticateRequest } from "@/lib/middleware"
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { authenticateRequest } from '@/lib/middleware'
 
-// Ambil detail pekerjaan berdasarkan ID
-export async function GET(request: NextRequest, { params }: { params: { id: string } }): Promise<NextResponse> {
+// Helper: Ambil ID dari URL dengan aman (Anti Error Next.js versi baru)
+function getId(request: NextRequest) {
+    const url = new URL(request.url)
+    return url.pathname.split('/').pop()
+}
+
+/**
+*GET /api/jobs/[id]
+* Ambil detail satu lowongan
+*/
+export async function GET(request: NextRequest) {
     try {
-        const { id } = params
+        const id = getId(request)
+        if (!id) return NextResponse.json({ error: 'ID tidak valid' }, { status: 400 })
 
-        // Cari pekerjaan di database dan data user pembuatnya
         const job = await prisma.job.findUnique({
             where: { id },
             include: {
-                user: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        role: true,
-                    },
-                },
-            },
-        })
+            user: { select: { id: true, name: true, email: true } }
+        }
+    })
 
-        // Kalau tidak ketemu
-        if (!job) {
-            return NextResponse.json(
-                { error: "Lowongan tidak ditemukan" }, 
-                { status: 404 }
-            )
-        }
-        return NextResponse.json({ job })
-    } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error("Terjadi kesalahan saat mengambil data pekerjaan:", error.message)
-        }
-        return NextResponse.json(
-            {error: "Terjadi kesalahan pada server"},
-            {status: 500}
-        )
+    if (!job) {
+        return NextResponse.json({ error: 'Lowongan tidak ditemukan' }, { status: 404 })
+    }
+
+    return NextResponse.json(job)
+    } catch (error) {
+        console.error('Error getting job detail:', error)
+        return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 })
     }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }): Promise<NextResponse> {
+/**
+ * PUT /api/jobs/[id]
+ * Update lowongan (Hanya Pemilik)
+ */
+export async function PUT(request: NextRequest) {
     try {
-        // Cek login
+    // 1. Cek Login
         const auth = authenticateRequest(request)
-        if (auth.error) {
-            return auth.error
-        }
+        if (auth.error) return auth.error
         const { user } = auth
-        const { id } = params
+
+        const id = getId(request)
         const body = await request.json()
 
-        // Cari data lama
-        const existingJob = await prisma.job.findUnique({ 
-            where: { id }, 
-        })
+    // 2. Cek apakah lowongan ada?
+        const existingJob = await prisma.job.findUnique({ where: { id } })
         if (!existingJob) {
-            return NextResponse.json(
-                { error: "Lowongan tidak ditemukan" }, 
-                { status: 404 }
-            )
-        }
+            return NextResponse.json({ error: 'Lowongan tidak ditemukan' }, { status: 404 })
+    }
 
-        // Cek pemilik (hanya atmint dan pemilik yang boleh ngedit)
-        const isOwner = existingJob.userId === user.userId
-        const isAdmin = user.role === 'ADMIN'
+    // 3. Cek Kepemilikan (PENTING!)
+    // User cuma boleh edit lowongan punya dia sendiri (kecuali ADMIN)
+    const isOwner = existingJob.userId === user.userId
+    const isAdmin = user.role === 'ADMIN'
 
-        if (!isOwner && !isAdmin) {
-            return NextResponse.json(
-                { error: "Anda tidak memiliki izin untuk mengedit lowongan ini" }, 
-                { status: 403 }
-            )
-        }
+    if (!isOwner && !isAdmin) {
+        return NextResponse.json({ error: 'Anda bukan pemilik lowongan ini' }, { status: 403 })
+    }
 
-        // Update data ke database 
-        const UpdatedJob = await prisma.job.update({
-            where: { id },
-            data: {
-                title: body.title,
-                company: body.company,
-                location: body.location,
-                type: body.type,
-                salary: body.salary,
-                description: body.description,
-                requirements: body.requirements,
-            },
-            include: {
-                user: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                        role: true,
-                    },
-                },
-            },
-        })
-        return NextResponse.json({ 
-            message: "Lowongan berhasil diperbarui",
-            job: UpdatedJob,
-        })
-    } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error("Terjadi kesalahan saat memperbarui data pekerjaan:", error.message)
+    // 4. Update Data
+    const updatedJob = await prisma.job.update({
+        where: { id },
+        data: {
+            title: body.title,
+            company: body.company,
+            location: body.location,
+            type: body.type,
+            salary: body.salary,
+            description: body.description,
+            requirements: body.requirements
         }
-        return NextResponse.json(
-            {error: "Terjadi kesalahan pada server"},
-            {status: 500}
-        )
+    })
+
+    return NextResponse.json({ message: 'Update sukses', job: updatedJob })
+
+    } catch (error) {
+        console.error('Update error:', error)
+        return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 })
     }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }): Promise<NextResponse> {
+/**
+ * DELETE /api/jobs/[id]
+ * Hapus lowongan (Hanya Pemilik)
+ */
+export async function DELETE(request: NextRequest) {
     try {
-        // Cek login
         const auth = authenticateRequest(request)
-        if (auth.error) {
-            return auth.error
-        }
+        if (auth.error) return auth.error
         const { user } = auth
-        const { id } = params
 
-        // Cari data lama
-        const existingJob = await prisma.job.findUnique({
-            where: { id },
-        })
-        if (!existingJob) {
-            return NextResponse.json(
-                { error: "Lowongan tidak ditemukan" }, 
-                { status: 404 }
-            )
-        }
+        const id = getId(request)
 
-        // Cek pemilik
+        const existingJob = await prisma.job.findUnique({ where: { id } })
+        if (!existingJob) return NextResponse.json({ error: 'Lowongan tidak ditemukan' }, { status: 404 })
+
         const isOwner = existingJob.userId === user.userId
         const isAdmin = user.role === 'ADMIN'
 
         if (!isOwner && !isAdmin) {
-            return NextResponse.json(
-                { error: "Anda tidak memiliki izin untuk menghapus lowongan ini" }, 
-                { status: 403 }
-            )
+            return NextResponse.json({ error: 'Anda bukan pemilik lowongan ini' }, { status: 403 })
         }
 
-        // Hapus dari database
-        await prisma.job.delete({
-            where: { id },
-        })
-        return NextResponse.json({ 
-            message: "Lowongan berhasil dihapus",
-        })
-    } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error("Terjadi kesalahan saat menghapus data pekerjaan:", error.message)
-        }
-        return NextResponse.json(
-            {error: "Terjadi kesalahan pada server"},
-            {status: 500}
-        )
+        await prisma.job.delete({ where: { id } })
+
+        return NextResponse.json({ message: 'Lowongan berhasil dihapus' })
+
+    } catch (error) {
+        console.error('Error deleting job:', error)
+        return NextResponse.json({ error: 'Terjadi kesalahan server' }, { status: 500 })
     }
 }
