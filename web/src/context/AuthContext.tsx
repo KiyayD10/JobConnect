@@ -1,8 +1,8 @@
 'use client'
 
 import { useRouter } from "next/router"
-import { createContext, useState } from "react"
-
+import { createContext, useEffect, useState } from "react"
+import Cookies from 'js-cookie'
 interface User {
     id: string
     name: string
@@ -25,5 +25,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [token, setToken] = useState<string | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const router = useRouter()
+
+    useEffect(() => {
+    // Cek cookie saat aplikasi dimuat
+    const storedToken = Cookies.get('token')
+    const storedUser = Cookies.get('user')
+    if (storedToken && storedUser) {
+    setToken(storedToken)
+    setUser(JSON.parse(storedUser))
+    }
+    setIsLoading(false)
+    }, [])
 
 }
