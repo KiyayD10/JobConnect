@@ -18,14 +18,18 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
- 
+  // =========================
+  // Handle Input Change
+  // =========================
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  
+  // =========================
+  // Handle Submit
+  // =========================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
