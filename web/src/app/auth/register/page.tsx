@@ -1,183 +1,163 @@
 "use client";
 
-import Link from 'next/link';
-import React from 'react'
-import { z } from 'zod';
-import { useForm } from "react-hook-form";
-import { zodResolver } from '@hookform/resolvers/zod';
-import { motion } from "framer-motion";
-
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/src/components/ui/card";
-import { Input } from "@/src/components/ui/input";
-import { Label } from "@/src/components/ui/label";
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/src/components/ui/button";
-import { Separator } from "@/src/components/ui/separator";
-import { Checkbox } from "@/src/components/ui/checkbox";
-import { cn } from "@/src/lib/utils";
-
-
-const registerSchema = z
-  .object({
-    name: z.string().min(3, { message: "Minimal 3 karakter" }),
-    email: z.string().email({ message: "Masukkan email yang valid" }),
-    password: z.string().min(6, { message: "Minimal 6 karakter" }),
-    confirmPassword: z.string().min(6, { message: "Minimal 6 karakter" }),
-    terms: z.boolean().refine((v) => v === true, {
-      message: "Anda harus menyetujui ketentuan",
-    }),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Kata sandi tidak cocok",
-    path: ["confirmPassword"],
-  });
-
-type RegisterSchema = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
+  const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterSchema>({
-    resolver: zodResolver(registerSchema),
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "JOBSEEKER",
   });
 
-  async function onSubmit(data: RegisterSchema) {
-    console.log("register", data);
-    await new Promise((r) => setTimeout(r, 800));
-  }
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-   return (
-    <>
-      
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-white p-6">
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.36 }}
-          className="w-full max-w-md"
-        >
-          <Card className="shadow-lg">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl">Daftar Akun Baru</CardTitle>
-              <CardDescription>
-                Buat akun untuk mulai menggunakan layanan
-              </CardDescription>
-            </CardHeader>
+ 
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-            <CardContent>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                {/* NAME */}
-                <div>
-                  <Label htmlFor="name">Nama Lengkap</Label>
-                  <Input
-                    id="name"
-                    placeholder="Masukkan nama lengkap"
-                    {...register("name")}
-                    className={cn(errors.name && "border-destructive mt-1")}
-                  />
-                  {errors.name && (
-                    <p className="text-sm text-destructive mt-1">
-                      {errors.name.message}
-                    </p>
-                  )}
-                </div>
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-                {/* EMAIL */}
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    placeholder="Masukkan email"
-                    {...register("email")}
-                    className={cn(errors.email && "border-destructive mt-1")}
-                  />
-                  {errors.email && (
-                    <p className="text-sm text-destructive mt-1">
-                      {errors.email.message}
-                    </p>
-                  )}
-                </div>
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
 
-                {/* PASSWORD */}
-                <div>
-                  <Label htmlFor="password">Kata Sandi</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Masukkan kata sandi"
-                    {...register("password")}
-                    className={cn(errors.password && "border-destructive mt-1")}
-                  />
-                  {errors.password && (
-                    <p className="text-sm text-destructive mt-1">
-                      {errors.password.message}
-                    </p>
-                  )}
-                </div>
+      const data = await res.json();
 
-                {/* CONFIRM PASSWORD */}
-                <div>
-                  <Label htmlFor="confirmPassword">Konfirmasi Kata Sandi</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="Ulangi kata sandi"
-                    {...register("confirmPassword")}
-                    className={cn(
-                      errors.confirmPassword && "border-destructive mt-1"
-                    )}
-                  />
-                  {errors.confirmPassword && (
-                    <p className="text-sm text-destructive mt-1">
-                      {errors.confirmPassword.message}
-                    </p>
-                  )}
-                </div>
+      if (!res.ok) {
+        setError(data.message || "Registrasi gagal");
+        return;
+      }
 
-                {/* TERMS */}
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="terms" {...register("terms")} />
-                  <Label htmlFor="terms" className="text-sm select-none">
-                    Saya menyetujui Syarat & Ketentuan
-                  </Label>
-                </div>
-                {errors.terms && (
-                  <p className="text-sm text-destructive mt-1">
-                    {errors.terms.message}
-                  </p>
-                )}
+      // sukses → redirect ke login
+      router.push("/login");
+    } catch (err) {
+      setError("Terjadi kesalahan, silakan coba lagi");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                {/* BUTTON */}
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                  {isSubmitting ? "Sedang membuat akun..." : "Daftar"}
-                </Button>
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow">
+        <h1 className="text-2xl font-bold text-center mb-2">
+          Buat Akun JobConnect
+        </h1>
+        <p className="text-sm text-gray-500 text-center mb-6">
+          Daftar sebagai pencari kerja atau perusahaan
+        </p>
 
-                <Separator />
+        {error && (
+          <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded">
+            {error}
+          </div>
+        )}
 
-                <div className="text-center text-sm">
-                  Sudah punya akun?{" "}
-                  <Link href="/auth/login" className="underline ml-1">
-                    Masuk
-                  </Link>
-                </div>
-              </form>
-            </CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Nama */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Nama Lengkap
+            </label>
+            <input
+              type="text"
+              name="name"
+              required
+              value={form.name}
+              onChange={handleChange}
+              className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Nama lengkap"
+            />
+          </div>
 
-            <CardFooter className="text-center text-xs text-muted-foreground">
-              Dengan mendaftar, Anda setuju dengan kebijakan kami.
-            </CardFooter>
-          </Card>
-        </motion.div>
+          {/* Email */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              required
+              value={form.email}
+              onChange={handleChange}
+              className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="email@example.com"
+            />
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              name="password"
+              required
+              minLength={6}
+              value={form.password}
+              onChange={handleChange}
+              className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Minimal 6 karakter"
+            />
+          </div>
+
+          {/* Role */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Daftar sebagai
+            </label>
+            <select
+              name="role"
+              value={form.role}
+              onChange={handleChange}
+              className="w-full border rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="JOBSEEKER">Pencari Kerja</option>
+              <option value="EMPLOYER">Perusahaan / Recruiter</option>
+            </select>
+          </div>
+
+          {/* Submit */}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={loading}
+          >
+            {loading ? "Memproses..." : "Daftar"}
+          </Button>
+        </form>
+
+        <p className="text-sm text-center text-gray-600 mt-6">
+          Sudah punya akun?{" "}
+          <Link
+            href="/login"
+            className="text-indigo-600 font-medium hover:underline"
+          >
+            Masuk
+          </Link>
+        </p>
       </div>
-    </>
+    </div>
   );
 }
