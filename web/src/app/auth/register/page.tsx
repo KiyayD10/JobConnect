@@ -1,167 +1,120 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Button } from "@/src/components/ui/button";
+import { useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/src/components/ui/button'
+import { Input } from '@/src/components/ui/input'
+import { useAuth } from '@/src/context/AuthContext'
 
 export default function RegisterPage() {
-  const router = useRouter();
+  const router = useRouter()
+  const { login } = useAuth()
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    role: "JOBSEEKER",
-  });
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [role, setRole] = useState<'JOBSEEKER' | 'EMPLOYER'>('JOBSEEKER')
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setIsLoading(true)
+    setError('')
 
-  // =========================
-  // Handle Input Change
-  // =========================
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+    const formData = new FormData(e.currentTarget)
+    const data = Object.fromEntries(formData.entries())
 
-  // =========================
-  // Handle Submit
-  // =========================
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+    const payload = {
+      ...data,
+      role,
+    }
 
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
+      const res = await fetch("http://localhost:3000/api/auth/register", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
 
-      const data = await res.json();
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Registration failed')
 
-      if (!res.ok) {
-        setError(data.message || "Registrasi gagal");
-        return;
-      }
-
-      // sukses → redirect ke login
-      router.push("/login");
+      // Auto login setelah register
+      login(json.token, json.user)
+      router.push('/')
     } catch (err) {
-      setError("Terjadi kesalahan, silakan coba lagi");
+      if (err instanceof Error) setError(err.message)
     } finally {
-      setLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow">
-        <h1 className="text-2xl font-bold text-center mb-2">
-          Buat Akun JobConnect
-        </h1>
-        <p className="text-sm text-gray-500 text-center mb-6">
-          Daftar sebagai pencari kerja atau perusahaan
-        </p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-gray-900">Buat Akun</h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Daftar sebagai pencari kerja atau perusahaan
+          </p>
+        </div>
 
         {error && (
-          <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 rounded">
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Nama */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Nama Lengkap
-            </label>
-            <input
-              type="text"
-              name="name"
-              required
-              value={form.name}
-              onChange={handleChange}
-              className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="Nama lengkap"
-            />
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Email
-            </label>
-            <input
-              type="email"
+        <form className="space-y-6" onSubmit={onSubmit}>
+          <div className="space-y-4">
+            <Input name="name" label="Nama Lengkap" placeholder="Masukkan Nama Lengkap Anda" required />
+            <Input
               name="email"
+              type="email"
+              label="Email"
+              placeholder="Masukkan Email Anda"
               required
-              value={form.email}
-              onChange={handleChange}
-              className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="email@example.com"
             />
-          </div>
-
-          {/* Password */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Password
-            </label>
-            <input
-              type="password"
+            <Input
               name="password"
+              type="password"
+              label="Password"
+              placeholder="••••••••"
               required
               minLength={6}
-              value={form.password}
-              onChange={handleChange}
-              className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="Minimal 6 karakter"
             />
+
+            {/*  PILIH ROLE */}
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">
+                Daftar sebagai
+              </label>
+              <select
+                value={role}
+                onChange={(e) =>
+                  setRole(e.target.value as 'JOBSEEKER' | 'EMPLOYER')
+                }
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm
+focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="JOBSEEKER">Pencari Kerja</option>
+                <option value="EMPLOYER">Perusahaan / Recruiter</option>
+              </select>
+            </div>
           </div>
 
-          {/* Role */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Daftar sebagai
-            </label>
-            <select
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-              className="w-full border rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="JOBSEEKER">Pencari Kerja</option>
-              <option value="EMPLOYER">Perusahaan / Recruiter</option>
-            </select>
-          </div>
-
-          {/* Submit */}
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={loading}
-          >
-            {loading ? "Memproses..." : "Daftar"}
+          <Button type="submit" className="w-full" isLoading={isLoading}>
+            Daftar Sekarang
           </Button>
-        </form>
 
-        <p className="text-sm text-center text-gray-600 mt-6">
-          Sudah punya akun?{" "}
-          <Link
-            href="/login"
-            className="text-indigo-600 font-medium hover:underline"
-          >
-            Masuk
-          </Link>
-        </p>
+          <p className="text-center text-sm text-gray-600">
+            Sudah punya akun?{' '}
+            <Link href="/auth/login" className="font-medium text-indigo-600 hover:underline">
+              Masuk di sini
+            </Link>
+          </p>
+        </form>
       </div>
     </div>
-  );
+  )
 }
