@@ -21,7 +21,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         if (!email || !password) {
             return NextResponse.json(
                 {error: "Email dan password wajib diisi"},
-                {status: 400}
+                {status: 400, headers: corsHeaders}
             )
         }
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         if (!user) {
             return NextResponse.json(
                 {error: "Email atau password salah"},
-                {status: 401}
+                {status: 401, headers: corsHeaders}
             )
         }
 
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         if (!isPasswordValid) {
             return NextResponse.json(
                 {error: "Email atau password salah"},
-                {status: 401}
+                {status: 401, headers: corsHeaders}
             )
         }
 
@@ -69,14 +69,17 @@ export async function POST(request: NextRequest): Promise<Response> {
             message: "Login berhasil",
             user: userResponse, 
             token,
-        })
+        },
+        { status: 200, headers: corsHeaders }
+        )
+        
     } catch (error: unknown) {
         if (error instanceof Error) {
             console.error("Login Gagal:", error.message)
         }
         return NextResponse.json(
             { error: "Terjadi kesalahan pada server" },
-            { status: 500 }
+            { status: 500, headers: corsHeaders }
         )
     }
 }
