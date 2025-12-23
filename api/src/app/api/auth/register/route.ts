@@ -21,7 +21,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         if (!email || !password || !name) {
             return NextResponse.json(
                 { error: "Semua field harus diisi" }, 
-                { status: 400 }
+                { status: 400, headers: corsHeaders }
             )
         }
 
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         if (!emailRegex.test(email)) {
             return NextResponse.json(
                 {error: "Format email tidak valid"},
-                {status: 400}
+                {status: 400, headers: corsHeaders}
             )
         }
 
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         if (password.length < 6) {
             return NextResponse.json(
                 {error: "Password minimal 6 karakter"},
-                {status: 400}
+                {status: 400, headers: corsHeaders}
             )
         }
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         if (exsistingUser) {
             return NextResponse.json(
                 {error: "Email sudah terdaftar"},
-                {status: 409}
+                {status: 409, headers: corsHeaders}
             )
         }
 
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest): Promise<Response> {
                 user,
                 token,
             },
-            { status: 201 }
+            { status: 201, headers: corsHeaders }
         )
 
     } catch (error: unknown) {
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         }
         return NextResponse.json(
             { error: "Internal server error" },
-            { status: 500 }
+            { status: 500, headers: corsHeaders }
         );
     }
 }
