@@ -1,5 +1,6 @@
 import Image from "next/image"
 import styles from "../dashboard.module.css"
+import Link from "next/link"
 
 export default function EmployerLayout({ children }: any) {
     return (
@@ -17,14 +18,15 @@ export default function EmployerLayout({ children }: any) {
                     </span>
 
                     <nav className={styles.nav}>
-                        <a href="/auth/login">Lowongan Saya</a>
-                        <a href="/dashboard/jobseeker/applications">Kandidat</a>
-                        <a href="/dashboard/jobseeker/profile">Profil</a>
+                       <Link href="/dashboard/jobseeker">Post Job</Link>
+                        <Link href="/dashboard/jobseeker/applications">Lowongan Saya</Link>
+                        <Link href="/dashboard/jobseeker/profile">Kandidat</Link>
+                        <Link href="/dashboard/jobseeker/profile">Profil</Link>
                     </nav>
                 </div>
 
 
-                <button className={styles.logout}>Logout</button>
+                <button className={styles.logout}><Link href="/auth/login">Logout</Link></button>
             </header>
 
             <main className={styles.main}>

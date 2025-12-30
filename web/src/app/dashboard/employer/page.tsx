@@ -14,7 +14,7 @@ export default function EmployerPage() {
 //           <h3 className="font-semibold text-lg">Pelamar Masuk</h3>
 //           <p className="text-3xl font-bold mt-2">32</p>
 //         </div>
-<div>halaman employer</div>
+  <div>halaman employer</div>
 //         <div className="bg-white p-6 rounded-lg shadow">
 //           <h3 className="font-semibold text-lg">Diterima</h3>
 //           <p className="text-3xl font-bold mt-2">4</p>
