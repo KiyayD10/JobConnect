@@ -1,31 +1,36 @@
-import styles from "./layout.module.css"
-import Link from "next/link"
+import Image from "next/image"
+import styles from "../dashboard.module.css"
 
-export default function EmployerLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <>
-      <header className={styles.header}>
-        {/* KIRI */}
-        <nav className={styles.navLeft}>
-          <Link href="/dashboard/employer">Dashboard</Link>
-          <Link href="/dashboard/employer/jobs">Lowongan Saya</Link>
-          <Link href="/dashboard/employer/candidates">Kandidat</Link>
-          <Link href="/dashboard/employer/post-job" className={styles.cta}>
-            + Post Job
-          </Link>
-        </nav>
+export default function EmployerLayout({ children }: any) {
+    return (
+        <>
+            <header className={styles.header}>
+                <div className={styles.left}>
+                    <span className={styles.logo}>
+                        <Image
+                            src="/images/logo.png"
+                            alt="Logo JobConnect"
+                            width={240}
+                            height={60}
+                            priority
+                        />
+                    </span>
 
-        {/* KANAN */}
-        <div className={styles.navRight}>
-          <button className={styles.logout}>Logout</button>
-        </div>
-      </header>
+                    <nav className={styles.nav}>
+                        <a href="/auth/login">Lowongan Saya</a>
+                        <a href="/dashboard/jobseeker/applications">Kandidat</a>
+                        <a href="/dashboard/jobseeker/profile">Profil</a>
+                    </nav>
+                </div>
 
-      <main className={styles.main}>{children}</main>
-    </>
-  )
+
+                <button className={styles.logout}>Logout</button>
+            </header>
+
+            <main className={styles.main}>
+                {children}
+            </main>
+
+        </>
+    )
 }
