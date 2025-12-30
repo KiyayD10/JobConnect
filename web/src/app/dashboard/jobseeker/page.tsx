@@ -44,8 +44,7 @@ export default function JobseekerDashboard() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Navbar */}
-      <Navbar />
-
+      
       {/* ================= HERO ================= */}
       <section className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-20">
         <div className="max-w-6xl mx-auto px-4 text-center">
