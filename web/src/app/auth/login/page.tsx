@@ -37,8 +37,17 @@ export default function LoginPage() {
       // simpan auth
       login(json.token, json.user)
 
-      // redirect setelah login
-      router.push("/")
+      // redirect setelah login (BERDASARKAN ROLE)
+      if (json.user.role === "JOBSEEKER") {
+        router.push("/dashboard/jobseeker")
+      } else if (json.user.role === "EMPLOYER") {
+        router.push("/dashboard/employer")
+      } else if (json.user.role === "ADMIN") {
+        router.push("/dashboard/admin")
+      } else {
+        router.push("/auth/login")
+      }
+
     } catch (err) {
       if (err instanceof Error) setError(err.message)
     } finally {
