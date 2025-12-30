@@ -1,21 +1,50 @@
 .header {
-  position: fixed;
-  top: 0;
+    top: 0;
   width: 100%;
   height: 64px;
+  padding: 0 32px;
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
+position: fixed;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   z-index: 50;
+  
 }
 
-.main {
-  min-height: 100vh;
-  padding-top: 64px;
+/* KIRI */
+.left {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(to bottom right, #f8fafc, #ffffff);
+  gap: 120px;
+}
+
+/* MENU */
+.nav {
+  display: flex;
+  gap: 100px;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #374151;
+  font-weight: 500;
+}
+
+.nav a:hover {
+  color: #4f46e5;
+}
+
+/* KANAN */
+.logout {
+  background: transparent;
+  border: none;
+  font-weight: 600;
+  color: #dc2626;
+  cursor: pointer;
+}
+
+.logout:hover {
+  text-decoration: underline;
 }
