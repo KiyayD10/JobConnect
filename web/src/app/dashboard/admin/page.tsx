@@ -1,8 +1,7 @@
-import DashboardLayout from '../layout'
+
 
 export default function AdminPage() {
   return (
-     <DashboardLayout title="Dashboard Admin">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 
         <div className="bg-white p-6 rounded-lg shadow">
@@ -26,6 +25,5 @@ export default function AdminPage() {
         </div>
 
       </div>
-    </DashboardLayout>
   )
 }
