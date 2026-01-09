@@ -1,67 +1,41 @@
-"use client"
+import { createContext, useState, useEffect, ReactNode } from "react";
 
-import { useRouter } from "next/navigation"
-import { createContext, useContext, useEffect, useState } from "react"
-import Cookies from 'js-cookie'
 interface User {
-    id: string
-    name: string
-    email: string
-    role: string
+  id: string;
+  name: string;
+  role: string;
+  email: string;
 }
 
 interface AuthContextType {
-    user: User | null
-    token: string | null
-    login: (token: string, user: User) => void
-    logout: () => void
-    isLoading: boolean
+  user: User | null;
+  login: (userData: User) => void;
+  logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+export const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null)
-    const [token, setToken] = useState<string | null>(null)
-    const [isLoading, setIsLoading] = useState(true)
-    const router = useRouter()
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
 
-    useEffect(() => {
-    // Cek cookie saat aplikasi dimuat
-    const storedToken = Cookies.get('token')
-    const storedUser = Cookies.get('user')
-    if (storedToken && storedUser) {
-        setToken(storedToken)
-        setUser(JSON.parse(storedUser))
-    }
-    setIsLoading(false)
-    }, [])
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) setUser(JSON.parse(storedUser));
+  }, []);
 
-    const login = (newToken: string, newUser: User) => {
-        setToken(newToken)
-        setUser(newUser)
-        Cookies.set('token', newToken, { expires: 7 }) // Simpan 7 hari
-        Cookies.set('user', JSON.stringify(newUser), { expires: 7 })
-        router.push('/') // Redirect ke home
-    }
+  const login = (userData: User) => {
+    localStorage.setItem("user", JSON.stringify(userData));
+    setUser(userData);
+  };
 
-    const logout = () => {
-        setToken(null)
-        setUser(null)
-        Cookies.remove('token')
-        Cookies.remove('user')
-        router.push('/auth/login')
-    }
+  const logout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+  };
 
-    return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
-    {children}
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
     </AuthContext.Provider>
-    )
-    }
-    export const useAuth = () => {
-    const context = useContext(AuthContext)
-    if (!context) throw new Error('useAuth must be used within an AuthProvider')
-    return context
-
-}
+  );
+};
