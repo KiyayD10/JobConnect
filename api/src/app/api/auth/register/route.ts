@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma"
-import { hashPassword, generateToken } from "@/lib/auth"
+import { prisma } from "@/lib/prisma";
+import { hashPassword } from "@/lib/auth";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "http://localhost:3001",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Headers": "Content-Type",
 };
 
 export async function OPTIONS() {
@@ -13,92 +13,31 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: NextRequest): Promise<Response> {
-    try{
-        const body = await request.json()
-        const {email, password, name, role} = body
+  try {
+    const { email, password, name, role } = await request.json();
 
-        // Validasi field (wajib)
-        if (!email || !password || !name) {
-            return NextResponse.json(
-                { error: "Semua field harus diisi" }, 
-                { status: 400, headers: corsHeaders }
-            )
-        }
-
-        // Validasi format email (Regex)
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-            return NextResponse.json(
-                {error: "Format email tidak valid"},
-                {status: 400, headers: corsHeaders}
-            )
-        }
-
-        // Validasi panjang password
-        if (password.length < 6) {
-            return NextResponse.json(
-                {error: "Password minimal 6 karakter"},
-                {status: 400, headers: corsHeaders}
-            )
-        }
-
-        // Cek apakah user sudah ada
-        const exsistingUser = await prisma.user.findUnique({
-            where: { email },
-        })
-        if (exsistingUser) {
-            return NextResponse.json(
-                {error: "Email sudah terdaftar"},
-                {status: 409, headers: corsHeaders}
-            )
-        }
-
-        // Enkripsi password sebelum disimpan (Hashing)
-        const hashedPassword = await hashPassword(password);
-
-        // Simpan user ke database
-        const user = await prisma.user.create({
-            data: {
-                email,
-                password: hashedPassword,
-                name,
-                role: role || 'JOBSEEKER',
-            },
-            // Pilih field yang mau dikembalikan (Password jangan dikirim balik!)
-            select: {
-                id: true,
-                email: true,
-                name: true,
-                role: true,
-                createdAt: true,
-            },
-        })
-
-        // Buat Token (JWT)
-        const token = generateToken({
-            userId: user.id,
-            email: user.email,
-            role: user.role,
-        })
-
-        // Kembalikan data user + token
-        return NextResponse.json(
-            {
-                message: 'Pengguna berhasil terdaftar',
-                user,
-                token,
-            },
-            { status: 201, headers: corsHeaders }
-        )
-
-    } catch (error: unknown) {
-        // Error Handling
-        if (error instanceof Error) {
-            console.error("Registration error:", error.message);
-        }
-        return NextResponse.json(
-            { error: "Internal server error" },
-            { status: 500, headers: corsHeaders }
-        );
+    if (!email || !password || !name) {
+      return NextResponse.json({ error: "Semua field harus diisi" }, { status: 400, headers: corsHeaders });
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) return NextResponse.json({ error: "Format email tidak valid" }, { status: 400, headers: corsHeaders });
+
+    if (password.length < 6) return NextResponse.json({ error: "Password minimal 6 karakter" }, { status: 400, headers: corsHeaders });
+
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) return NextResponse.json({ error: "Email sudah terdaftar" }, { status: 409, headers: corsHeaders });
+
+    const hashedPassword = await hashPassword(password);
+
+    const user = await prisma.user.create({
+      data: { email, password: hashedPassword, name, role: role || "JOBSEEKER" },
+      select: { id: true, email: true, name: true, role: true, createdAt: true },
+    });
+
+    return NextResponse.json({ message: "Pengguna berhasil terdaftar", user }, { status: 201, headers: corsHeaders });
+  } catch (error: unknown) {
+    console.error("Register error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500, headers: corsHeaders });
+  }
 }
