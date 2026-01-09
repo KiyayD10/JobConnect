@@ -28,7 +28,7 @@ export default function JobseekerDashboard() {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await fetch("/api/jobs"); // ganti ke ENV jika backend terpisah
+        const res = await fetch("http://localhost:3000/api/jobs"); // ganti ke ENV jika backend terpisah
         const data = await res.json();
         setJobs(data.jobs || []);
       } catch (error) {
