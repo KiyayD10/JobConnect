@@ -48,3 +48,8 @@ position: fixed;
 .logout:hover {
   text-decoration: underline;
 }
+
+/* Konten dashboard */
+.dashboard-content {
+  padding-top: 64px; /* Sama dengan tinggi navbar */
+}

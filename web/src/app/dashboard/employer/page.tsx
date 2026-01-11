@@ -8,7 +8,7 @@ export default function EmployerPage() {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div>
+    <div style={{ paddingTop: "64px" }}>
       <h1>Dashboard Employer</h1>
 
       <p>
