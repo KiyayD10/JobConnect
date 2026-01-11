@@ -1,26 +1,25 @@
-// import DashboardLayout from '../layout'
+"use client";
+
+import { useAuth } from "@/src/context/AuthContext";
 
 export default function EmployerPage() {
+  const { user, loading } = useAuth();
+
+  if (loading) return <p>Loading...</p>;
+
   return (
-//      <DashboardLayout title="Dashboard Employer">
-//       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div>
+      <h1>Dashboard Employer</h1>
 
-//         <div className="bg-white p-6 rounded-lg shadow">
-//           <h3 className="font-semibold text-lg">Lowongan Aktif</h3>
-//           <p className="text-3xl font-bold mt-2">5</p>
-//         </div>
+      <p>
+        Selamat datang, <strong>{user?.name}</strong>
+      </p>
 
-//         <div className="bg-white p-6 rounded-lg shadow">
-//           <h3 className="font-semibold text-lg">Pelamar Masuk</h3>
-//           <p className="text-3xl font-bold mt-2">32</p>
-//         </div>
-  <div>halaman employer</div>
-//         <div className="bg-white p-6 rounded-lg shadow">
-//           <h3 className="font-semibold text-lg">Diterima</h3>
-//           <p className="text-3xl font-bold mt-2">4</p>
-//         </div>
-
-//       </div>
-//     </DashboardLayout>
-  )
+      <ul>
+        <li>📌 Kelola lowongan pekerjaan</li>
+        <li>👥 Lihat kandidat pelamar</li>
+        <li>🏢 Update profil perusahaan</li>
+      </ul>
+    </div>
+  );
 }

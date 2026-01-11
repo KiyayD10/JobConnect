@@ -1,38 +1,64 @@
-import Image from "next/image"
-import styles from "../dashboard.module.css"
-import Link from "next/link"
+"use client";
 
-export default function EmployerLayout({ children }: any) {
-    return (
-        <>
-            <header className={styles.header}>
-                <div className={styles.left}>
-                    <span className={styles.logo}>
-                        <Image
-                            src="/images/logo.png"
-                            alt="Logo JobConnect"
-                            width={240}
-                            height={60}
-                            priority
-                        />
-                    </span>
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAuth } from "@/src/context/AuthContext";
+import styles from "../dashboard.module.css";
 
-                    <nav className={styles.nav}>
-                       <Link href="/dashboard/employer/jobs/add">Post Job</Link>
-                        <Link href="/dashboard/jobseeker/applications">Lowongan Saya</Link>
-                        <Link href="/dashboard/jobseeker/profile">Kandidat</Link>
-                        <Link href="/dashboard/jobseeker/profile">Profil</Link>
-                    </nav>
-                </div>
+export default function EmployerLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user, loading, logout } = useAuth();
+  const router = useRouter();
 
+  // 🔐 Client-side guard
+  useEffect(() => {
+    if (loading) return;
 
-                <button className={styles.logout}><Link href="/auth/login">Logout</Link></button>
-            </header>
+    if (!user || user.role !== "EMPLOYER") {
+      router.replace("/auth/login");
+    }
+  }, [user, loading, router]);
 
-            <main className={styles.main}>
-                {children}
-            </main>
+  if (loading || !user) return null;
 
-        </>
-    )
+  const handleLogout = () => {
+    logout();
+    router.replace("/auth/login");
+  };
+
+  return (
+    <>
+      <header className={styles.header}>
+        <div className={styles.left}>
+          <span className={styles.logo}>
+            <Image
+              src="/images/logo.png"
+              alt="Logo JobConnect"
+              width={240}
+              height={60}
+              priority
+            />
+          </span>
+
+          <nav className={styles.nav}>
+            <Link href="/dashboard/employer/jobs">Lowongan Saya</Link>
+            <Link href="/dashboard/employer/jobs/add">Post Job</Link>
+            <Link href="/dashboard/employer/candidates">Kandidat</Link>
+            <Link href="/dashboard/employer/profile">Profil</Link>
+          </nav>
+        </div>
+
+        <button onClick={handleLogout} className={styles.logout}>
+          Logout
+        </button>
+      </header>
+
+      <main className={styles.main}>{children}</main>
+    </>
+  );
 }

@@ -1,57 +1,49 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/src/components/ui/button"
-import { Input } from "@/src/components/ui/input"
-import { useAuth } from "@/src/context/AuthContext"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Input } from "@/src/components/ui/input";
+import { Button } from "@/src/components/ui/button";
+import Link from "next/link";
+import { useAuth } from "@/src/context/AuthContext";
+import api from "@/src/lib/axios";
 
 export default function LoginPage() {
-  const router = useRouter()
-  const { login } = useAuth()
+  const router = useRouter();
+  const { login } = useAuth();
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-    const formData = new FormData(e.currentTarget)
-    const data = Object.fromEntries(formData.entries())
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      })
+      // POST ke API login menggunakan axios
+      const res = await api.post("/auth/login", data);
 
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error || "Login gagal")
+      // simpan user ke context
+      await login(res.data.user);
 
-      // simpan auth
-      login(json.token, json.user)
+      // redirect sesuai role
+      const role = res.data.user.role;
+      console.log("Redirecting role:", role);
 
-      // redirect setelah login (BERDASARKAN ROLE)
-      if (json.user.role === "JOBSEEKER") {
-        router.push("/dashboard/jobseeker")
-      } else if (json.user.role === "EMPLOYER") {
-        router.push("/dashboard/employer")
-      } else if (json.user.role === "ADMIN") {
-        router.push("/dashboard/admin")
-      } else {
-        router.push("/auth/login")
-      }
+      if (role === "JOBSEEKER") router.push("/dashboard/jobseeker");
+      else if (role === "EMPLOYER") router.push("/dashboard/employer");
+      else if (role === "ADMIN") router.push("/dashboard/admin");
+      else router.push("/auth/login"); // fallback
 
-    } catch (err) {
-      if (err instanceof Error) setError(err.message)
+    } catch (err: any) {
+      console.error(err);
+      setError(err.response?.data?.error || "Login gagal");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -75,23 +67,8 @@ export default function LoginPage() {
         )}
 
         <form className="mt-8 space-y-6" onSubmit={onSubmit}>
-          <div className="space-y-4">
-            <Input
-              name="email"
-              type="email"
-              label="Email"
-              placeholder="nama@email.com"
-              required
-            />
-            <Input
-              name="password"
-              type="password"
-              label="Password"
-              placeholder="••••••••"
-              required
-              minLength={6}
-            />
-          </div>
+          <Input name="email" type="email" label="Email" placeholder="Email" required />
+          <Input name="password" type="password" label="Password" placeholder="Password" required />
 
           <Button type="submit" className="w-full" isLoading={isLoading}>
             Masuk
@@ -99,15 +76,12 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-gray-600">
             Belum punya akun?{" "}
-            <Link
-              href="/auth/register"
-              className="font-medium text-indigo-600 hover:underline"
-            >
+            <Link href="/auth/register" className="text-indigo-600 hover:underline">
               Daftar sekarang
             </Link>
           </p>
         </form>
       </div>
     </div>
-  )
+  );
 }
