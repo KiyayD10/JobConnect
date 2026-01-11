@@ -46,7 +46,8 @@ export default function EmployerLayout({
           </span>
 
           <nav className={styles.nav}>
-            <Link href="/dashboard/employer/jobs">Lowongan Saya</Link>
+            <Link href="/dashboard/employer">Beranda</Link>
+            <Link href="/dashboard/employer/jobs/view">Lowongan Saya</Link>
             <Link href="/dashboard/employer/jobs/add">Post Job</Link>
             <Link href="/dashboard/employer/candidates">Kandidat</Link>
             <Link href="/dashboard/employer/profile">Profil</Link>

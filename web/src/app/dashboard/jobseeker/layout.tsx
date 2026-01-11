@@ -18,7 +18,8 @@ export default function JobseekerLayout({ children }: any) {
                     </span>
 
                     <nav className={styles.nav}>
-                        <Link href="/dashboard/jobseeker">Cari Pekerjaan</Link>
+                        <Link href="/dashboard/jobseeker">Beranda</Link>
+                        <Link href="/dashboard/jobseeker/f">Cari Pekerjaan</Link>
                         <Link href="/dashboard/jobseeker/applications">Lamaran Saya</Link>
                         <Link href="/dashboard/jobseeker/profile">Profil</Link>
                     </nav>

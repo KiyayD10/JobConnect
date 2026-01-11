@@ -89,7 +89,7 @@ export default function EmployerJobsPage() {
 
       <button
         style={{ marginBottom: 16 }}
-        onClick={() => router.push("/employer/jobs/create")}
+        onClick={() => router.push("/employer/jobs/add")}
       >
         + Tambah Job
       </button>
