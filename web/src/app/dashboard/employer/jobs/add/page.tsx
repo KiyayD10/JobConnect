@@ -1,101 +1,82 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import api from "@/src/lib/axios"
-import axios from "axios"
+import { useState } from "react";
+import api from "@/src/lib/axios";
+import { useAuth } from "@/src/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function AddJobPage() {
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState("")
+  const { user } = useAuth();
+  const router = useRouter();
 
-  const testApi = async () => {
-    try {
-      setLoading(true)
-      setMessage("")
+  const [form, setForm] = useState({
+    title: "",
+    company: "",
+    location: "",
+    type: "FULLTIME",
+    salary: "",
+    description: "",
+    requirements: "",
+  });
 
-      const res = await api.get("/jobs")
-      console.log("HASIL:", res.data)
-
-      setMessage("✅ GET /jobs berhasil (cookie terkirim)")
-    } catch (err: unknown) {
-      console.error(err)
-
-      if (axios.isAxiosError(err)) {
-        setMessage(err.response?.data?.error || "❌ Axios error")
-      } else {
-        setMessage("❌ Error tidak diketahui")
-      }
-    } finally {
-      setLoading(false)
-    }
+  if (!user || user.role !== "EMPLOYER") {
+    router.push("/login");
+    return null;
   }
 
-  const createJob = async () => {
-    try {
-      setLoading(true)
-      setMessage("")
 
-      const res = await api.post("/jobs", {
-        title: "Frontend Developer",
-        company: "JobConnect",
-        location: "Bandung",
-        type: "FULLTIME",
-        salary: 8000000,
-        description: "Mengerjakan UI aplikasi",
-        requirements: "React, Next.js",
-      })
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-      console.log("CREATED:", res.data)
-      setMessage("✅ Lowongan berhasil dibuat")
-    } catch (err: unknown) {
-      console.error(err)
+    await api.post("/jobs", {
+      ...form,
+      userId: user.id,
+    });
 
-      if (axios.isAxiosError(err)) {
-        setMessage(err.response?.data?.error || "❌ Axios error")
-      } else {
-        setMessage("❌ Error tidak diketahui")
-      }
-    } finally {
-      setLoading(false)
-    }
-  }
+    router.push("/employer/jobs");
+  };
 
   return (
-    <div style={{ padding: 24 }}>
-      <h1 style={{ fontSize: 20, fontWeight: "bold" }}>
-        Add Job (Employer)
-      </h1>
+    <form onSubmit={handleSubmit}>
+      <h1>Tambah Lowongan</h1>
 
-      <div style={{ marginTop: 16 }}>
-        <button
-          onClick={testApi}
-          disabled={loading}
-          style={{
-            padding: "10px 16px",
-            marginRight: 8,
-            background: "#2563eb",
-            color: "white",
-          }}
-        >
-          TEST GET /jobs
-        </button>
+      <input
+        placeholder="Judul"
+        onChange={(e) => setForm({ ...form, title: e.target.value })}
+      />
 
-        <button
-          onClick={createJob}
-          disabled={loading}
-          style={{
-            padding: "10px 16px",
-            background: "#16a34a",
-            color: "white",
-          }}
-        >
-          CREATE JOB
-        </button>
-      </div>
+      <input
+        placeholder="Perusahaan"
+        onChange={(e) => setForm({ ...form, company: e.target.value })}
+      />
 
-      {message && (
-        <p style={{ marginTop: 16 }}>{message}</p>
-      )}
-    </div>
-  )
+      <input
+        placeholder="Lokasi"
+        onChange={(e) => setForm({ ...form, location: e.target.value })}
+      />
+
+      <select
+        value={form.type}
+        onChange={(e) => setForm({ ...form, type: e.target.value })}
+      >
+        <option value="FULLTIME">Full Time</option>
+        <option value="PARTTIME">Part Time</option>
+        <option value="INTERNSHIP">Internship</option>
+      </select>
+
+      <textarea
+        placeholder="Deskripsi"
+        onChange={(e) => setForm({ ...form, description: e.target.value })}
+      />
+
+      <textarea
+        placeholder="Requirement"
+        onChange={(e) =>
+          setForm({ ...form, requirements: e.target.value })
+        }
+      />
+
+      <button type="submit">Simpan</button>
+    </form>
+  );
 }
