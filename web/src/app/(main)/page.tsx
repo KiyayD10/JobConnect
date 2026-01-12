@@ -197,20 +197,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* ================= FOOTER ================= */}
-      <footer className="border-t border-gray-100 py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col items-center">
-          <Image
-            src="/images/logo.png"
-            alt="Logo JobConnect"
-            width={200}
-            height={50}
-            className="opacity-80 grayscale hover:grayscale-0 transition-all mb-6"
-          />
-          <p className="text-sm text-gray-400 font-bold tracking-widest uppercase">© 2026 JobConnect – Solusi Karir Digital</p>
-        </div>
-      </footer>
     </div>
   );
 }
