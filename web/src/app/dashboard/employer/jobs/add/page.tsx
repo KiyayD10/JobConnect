@@ -6,6 +6,7 @@ import { useAuth } from "@/src/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
+import styles from "../../dashboard.module.css";
 
 const jobTypes = [
   { value: "FULLTIME", label: "Full Time" },
