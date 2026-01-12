@@ -219,3 +219,18 @@ position: fixed;
 .btnSecondary:hover {
   background-color: #f9fafb;
 }
+.textArea {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  outline: none;
+  transition: all 0.2s;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.textArea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
