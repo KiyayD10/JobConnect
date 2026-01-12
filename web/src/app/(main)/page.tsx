@@ -54,16 +54,16 @@ export default function HomePage() {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-gray-600">
-            <Link href="/jobs" className="hover:text-blue-600 transition-colors">Cari Kerja</Link>
-            <Link href="/employer/jobs" className="hover:text-blue-600 transition-colors">Untuk Perusahaan</Link>
+            <Link href="auth/login" className="hover:text-blue-600 transition-colors">Cari Kerja</Link>
+            <Link href="auth/login" className="hover:text-blue-600 transition-colors">Untuk Perusahaan</Link>
           </div>
 
           {/* Action Buttons */}
           <div className="flex items-center gap-3">
-            <Link href="/login">
+            <Link href="auth/login">
               <Button variant="ghost" className="font-bold text-gray-700">Masuk</Button>
             </Link>
-            <Link href="/register">
+            <Link href="auth/register">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-full font-bold shadow-lg shadow-blue-100 transition-all active:scale-95">
                 Daftar
               </Button>
@@ -129,7 +129,7 @@ export default function HomePage() {
             <h2 className="text-3xl font-black text-gray-900 tracking-tight">Lowongan Populer</h2>
             <div className="h-1.5 w-20 bg-blue-600 mt-2 rounded-full"></div>
           </div>
-          <Link href="/jobs" className="flex items-center gap-2 text-blue-600 font-bold hover:gap-3 transition-all">
+          <Link href="auth/login" className="flex items-center gap-2 text-blue-600 font-bold hover:gap-3 transition-all">
             Lihat Semua <ArrowRight size={18} />
           </Link>
         </div>
@@ -189,7 +189,7 @@ export default function HomePage() {
             <p className="text-blue-100 text-lg mb-10 max-w-2xl font-medium opacity-90">
               Bergabunglah dengan ribuan perusahaan sukses yang telah menemukan kandidat impian mereka melalui platform JobConnect.
             </p>
-            <Link href="/employer/jobs/add">
+            <Link href="auth/login">
               <Button className="bg-white text-blue-600 hover:bg-blue-50 px-12 py-8 rounded-2xl font-black text-xl transition-all hover:scale-105 active:scale-95 shadow-xl">
                 Mulai Pasang Lowongan
               </Button>
