@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Search, MapPin, Briefcase, DollarSign } from "lucide-react";
 import Navbar from "@/src/components/ui/navbar";
 import { Button } from "@/src/components/ui/button";
+import Image from "next/image";
 
 // =====================
 // Type Job (Prisma)
@@ -44,7 +45,7 @@ export default function JobseekerDashboard() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Navbar */}
-      
+
       {/* ================= HERO ================= */}
       <section className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-20">
         <div className="max-w-6xl mx-auto px-4 text-center">
@@ -135,6 +136,19 @@ export default function JobseekerDashboard() {
           </div>
         )}
       </main>
+      {/* ================= FOOTER ================= */}
+      <footer className="border-t border-gray-100 py-4 bg-white">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col items-center">
+          <Image
+            src="/images/logo.png"
+            alt="Logo JobConnect"
+            width={200}
+            height={50}
+            className="opacity-80 grayscale hover:grayscale-0 transition-all mb-2"
+          />
+          <p className="text-sm text-gray-400 font-bold tracking-widest uppercase">© 2026 JobConnect – Solusi Karir Digital</p>
+        </div>
+      </footer>
     </div>
   );
 }
