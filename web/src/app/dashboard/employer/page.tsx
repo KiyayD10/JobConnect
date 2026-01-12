@@ -32,27 +32,27 @@ export default function EmployerPage() {
     );
   }
 
-  const stats = [
+  const stats : StatItem[] = [
     {
       title: "Kelola Lowongan",
       description: "Lihat, edit, dan pantau status semua lowongan kerja Anda.",
-      icon: <Briefcase className="text-blue-600" size={24} />,
+      icon: <Briefcase size={24} color="#2563eb" />,
       link: "/dashboard/employer/jobs",
-      color: "bg-blue-50",
+      bgColor: "#eff6ff",
     },
     {
       title: "Kandidat Pelamar",
       description: "Review CV dan profil kandidat yang telah melamar.",
-      icon: <Users className="text-purple-600" size={24} />,
-      link: "/daemployer/applicants",
-      color: "bg-purple-50",
+      icon: <Users size={24} color="#9333ea" />,
+      link: "/dashboard/employer/applicants",
+      bgColor: "#f5f3ff",
     },
     {
       title: "Profil Perusahaan",
       description: "Update informasi dan branding perusahaan Anda.",
-      icon: <Building2 className="text-orange-600" size={24} />,
+      icon: <Building2 size={24} color="#ea580c" />,
       link: "/employer/profile",
-      color: "bg-orange-50",
+      bgColor: "#fff7ed",
     },
   ];
 
