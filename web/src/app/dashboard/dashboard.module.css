@@ -181,3 +181,41 @@ position: fixed;
 .inputError {
   border-color: #ef4444;
 }
+
+.errorText {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.dropdownButton {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.btnActionGroup {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btnSecondary {
+  padding: 0.625rem 1.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: white;
+  cursor: pointer;
+}
+
+.btnSecondary:hover {
+  background-color: #f9fafb;
+}
