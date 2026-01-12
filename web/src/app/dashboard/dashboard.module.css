@@ -53,3 +53,16 @@ position: fixed;
 .dashboard-content {
   padding-top: 64px; /* Sama dengan tinggi navbar */
 }
+
+.dbContainer {
+  min-height: 100vh;
+  background-color: #f9fafb;
+  padding-top: 5rem;
+  padding-bottom: 2.5rem;
+}
+
+.contentWrapper {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
