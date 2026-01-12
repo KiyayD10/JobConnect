@@ -57,70 +57,63 @@ export default function EmployerPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 pb-10">
-      <div className="container mx-auto px-4 max-w-6xl">
+    <div className={styles.dbContainer}>
+      <div className={styles.contentWrapper}>
         
         {/* Welcome Header */}
-        <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div className={styles.welcomeHeader}>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Halo, {user?.name}! 👋
+              Halo, {user?.name || "User"}! 👋
             </h1>
-            <p className="text-gray-600 mt-2 text-lg">
-              Senang melihat Anda kembali. Apa yang ingin Anda lakukan hari ini?
+            <p className="text-gray-600 mt-2">
+              Apa yang ingin Anda lakukan hari ini?
             </p>
           </div>
           <button
-            onClick={() => router.push("dashboard/employer/jobs/add")}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-blue-200 active:scale-95"
+            onClick={() => router.push("/dashboard/employer/jobs/add")}
+            className={styles.btnPost}
           >
             <PlusCircle size={20} />
             Pasang Lowongan Baru
           </button>
         </div>
 
-        {/* Stats / Quick Summary (Opsional) */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        {/* Stats Grid */}
+        <div className={styles.dbGrid}>
           {stats.map((item, index) => (
             <div
               key={index}
               onClick={() => router.push(item.link)}
-              className="group bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:border-blue-300 hover:shadow-md transition-all cursor-pointer relative overflow-hidden"
+              className={styles.statCard}
             >
-              <div className={`${item.color} w-12 h-12 rounded-lg flex items-center justify-center mb-4`}>
+              <div className={styles.iconBox} style={{ backgroundColor: item.bgColor }}>
                 {item.icon}
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
+              <h3 className="text-xl font-bold mb-2">{item.title}</h3>
               <p className="text-gray-500 mb-4">{item.description}</p>
               
-              <div className="flex items-center text-blue-600 font-semibold text-sm group-hover:gap-2 transition-all">
-                Buka Sekarang <ArrowRight size={16} />
-              </div>
-
-              {/* Dekorasi kecil di pojok */}
-              <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                {item.icon}
+              <div className="flex items-center text-blue-600 font-semibold text-sm">
+                Buka Sekarang <ArrowRight size={16} className="ml-1" />
               </div>
             </div>
           ))}
         </div>
 
         {/* Insight Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className={styles.insightSection}>
           <div className="flex items-center gap-4">
-            <div className="bg-white/20 p-3 rounded-full">
-              <TrendingUp size={32} />
-            </div>
+            <TrendingUp size={32} />
             <div>
-              <h2 className="text-xl font-bold">Dapatkan Talenta Terbaik</h2>
-              <p className="opacity-90 text-sm">Lowongan yang lengkap dan jelas menarik 3x lebih banyak pelamar berkualitas.</p>
+              <h2 className="text-xl font-bold">Tips Rekrutmen</h2>
+              <p className="text-sm opacity-90">Tingkatkan kualitas deskripsi pekerjaan Anda.</p>
             </div>
           </div>
           <button 
             onClick={() => router.push("/employer/tips")}
-            className="bg-white text-blue-700 px-6 py-2 rounded-lg font-bold text-sm hover:bg-blue-50 transition-colors"
+            className="bg-white text-blue-700 px-6 py-2 rounded-lg font-bold"
           >
-            Lihat Tips Rekrutmen
+            Lihat Tips
           </button>
         </div>
 
