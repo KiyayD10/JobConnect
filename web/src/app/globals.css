@@ -120,3 +120,255 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* home.css */
+
+/* --- Layout Dasar --- */
+.home-wrapper {
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: #111827;
+}
+
+/* --- Navbar --- */
+.nav-custom {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 50;
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #f3f4f6;
+  height: 5rem;
+  display: flex;
+  align-items: center;
+}
+
+.nav-container {
+  max-width: 80rem;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* --- Hero Section --- */
+.hero-section {
+  position: relative;
+  padding: 10rem 1rem 5rem;
+  background-color: #fafbff;
+  overflow: hidden;
+  text-align: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  background-color: #eff6ff;
+  border: 1px solid #dbeafe;
+  color: #2563eb;
+  font-size: 0.75rem;
+  font-weight: 900;
+  margin-bottom: 2rem;
+}
+
+.hero-title {
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 2rem;
+}
+
+.hero-title span {
+  color: #2563eb;
+}
+
+/* --- Search Box --- */
+.search-container {
+  max-width: 56rem;
+  margin: 0 auto;
+  background: white;
+  padding: 0.6rem;
+  border-radius: 1.25rem;
+  box-shadow: 0 25px 50px -12px rgba(37, 99, 235, 0.1);
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.search-input-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  min-width: 200px;
+}
+
+.search-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.border-mobile {
+  border-left: 1px solid #f1f5f9;
+}
+
+.search-button {
+  background-color: #2563eb !important;
+  color: white !important;
+  padding: 0.75rem 2rem !important;
+  border-radius: 0.75rem !important;
+  font-weight: 700 !important;
+}
+
+/* --- Job Cards --- */
+.job-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  padding: 2rem 0;
+}
+
+.job-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 2rem;
+  border: 1px solid #f1f5f9;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.job-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.icon-wrapper {
+  width: 3rem;
+  height: 3rem;
+  background-color: #eff6ff;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.job-badge {
+  background-color: #eff6ff;
+  color: #2563eb;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.job-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.company-name {
+  color: #64748b;
+  font-weight: 600;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.card-footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid #f8fafc;
+}
+
+.location-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+/* --- Section Header --- */
+.section-header {
+  margin-bottom: 2rem;
+}
+
+.header-line {
+  height: 4px;
+  width: 50px;
+  background-color: #2563eb;
+  margin-top: 0.5rem;
+  border-radius: 2px;
+}
+
+/* --- Employer Banner (Slim & Compact) --- */
+.employer-banner {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border-radius: 1.5rem; /* Lebih kecil agar tidak terlalu membulat */
+  padding: 2.5rem 2rem; /* Padding dikurangi agar slim */
+  text-align: center;
+  color: white;
+  margin-bottom: 5rem;
+  position: relative;
+  overflow: hidden;
+  max-width: 64rem; /* Batasi lebar banner */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.banner-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.banner-desc {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+}
+
+.banner-button {
+  background-color: white !important;
+  color: #2563eb !important;
+  padding: 0.75rem 2rem !important;
+  border-radius: 0.75rem !important;
+  font-weight: 700 !important;
+}
+
+/* Skeleton */
+.skeleton-card {
+  height: 250px;
+  background-color: #f1f5f9;
+  border-radius: 2rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .5; }
+}
+
+@media (max-width: 768px) {
+  .search-container { flex-direction: column; }
+  .border-mobile { border-left: none; border-top: 1px solid #f1f5f9; }
+}
