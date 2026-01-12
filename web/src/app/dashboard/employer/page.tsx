@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/src/context/AuthContext";
+import styles from "../dashboard.module.css";
 import { useRouter } from "next/navigation";
 import { 
   Briefcase, 
