@@ -11,6 +11,15 @@ import {
   TrendingUp
 } from "lucide-react";
 
+// Definisi tipe data untuk TypeScript
+interface StatItem {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  link: string;
+  bgColor: string;
+}
+
 export default function EmployerPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
