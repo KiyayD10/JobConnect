@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-// ✅ FIX: Import dari @/lib/auth (bukan middleware)
 import { authenticateRequest } from "@/lib/auth"; 
 
 export async function GET(request: NextRequest) {
     try {
-        // ✅ FIX: Tambahkan 'await' karena verifikasi token itu async
         const auth = await authenticateRequest(request);
         if (auth.error) return auth.error;
 

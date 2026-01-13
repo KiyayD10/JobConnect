@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { jwtVerify } from "jose";
 import { NextRequest, NextResponse } from "next/server";
 
-const JWT_SECRET = process.env.JWT_SECRET || "rahasia-negara"; // Pastikan sama dengan Login
+const JWT_SECRET = process.env.JWT_SECRET || "ini-adalah-my-kunci-guweh"; 
 
 // 1. Hash Password
 export async function hashPassword(password: string): Promise<string> {

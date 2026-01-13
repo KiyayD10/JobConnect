@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { comparePassword } from "@/lib/auth";
-import { SignJWT } from "jose"; // Wajib install: npm install jose
+import { SignJWT } from "jose"; 
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "http://localhost:3001",
@@ -29,14 +29,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Password salah" }, { status: 401, headers: corsHeaders });
     }
 
-    // ✅ FIX: Buat Token JWT (PENTING!)
+    // Buat Token JWT 
     const secret = new TextEncoder().encode(process.env.JWT_SECRET || "rahasia-negara");
     const token = await new SignJWT({ userId: user.id, role: user.role })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("7d")
       .sign(secret);
 
-    // ✅ FIX ESLint: Buat object baru agar tidak perlu destructuring user.password yang unused
+    // Buat object baru agar tidak perlu destructuring user.password yang unused
     const userData = {
       id: user.id,
       name: user.name,
