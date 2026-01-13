@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { Prisma, JobType } from "@prisma/client"
 
-// =======================
-// GET JOBS
-// =======================
+
+// Ambil pekerjaan
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -54,9 +53,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// =======================
-// CREATE JOB
-// =======================
+// Buat pekerjaan
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -68,7 +65,7 @@ export async function POST(request: NextRequest) {
       salary,
       description,
       requirements,
-      userId, // 👈 DARI FRONTEND
+      userId, 
     } = body
 
     if (!title || !company || !location || !description || !requirements || !userId) {

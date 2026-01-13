@@ -1,17 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 
-// =======================
 // Helper: Ambil ID dari URL
-// =======================
 function getId(request: NextRequest) {
   const segments = new URL(request.url).pathname.split("/").filter(Boolean)
   return segments[segments.length - 1]
 }
 
-// =======================
-// GET JOB BY ID
-// =======================
+
+// Ambil pekerjaan berdasarkan ID
 export async function GET(request: NextRequest) {
   try {
     const id = getId(request)
@@ -31,9 +28,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// =======================
 // UPDATE JOB (Hanya Owner/Admin)
-// =======================
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
@@ -49,7 +44,7 @@ export async function PUT(request: NextRequest) {
     if (!existingJob) return NextResponse.json({ error: "Lowongan tidak ditemukan" }, { status: 404 })
 
     const isOwner = existingJob.userId === userId
-    const isAdmin = body.role === "ADMIN" // role dikirim dari frontend
+    const isAdmin = body.role === "ADMIN" 
 
     if (!isOwner && !isAdmin) return NextResponse.json({ error: "Anda bukan pemilik lowongan ini" }, { status: 403 })
 
@@ -65,9 +60,8 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// =======================
+
 // DELETE JOB (Hanya Owner/Admin)
-// =======================
 export async function DELETE(request: NextRequest) {
   try {
     const body = await request.json()
