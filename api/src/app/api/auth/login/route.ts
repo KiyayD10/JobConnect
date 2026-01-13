@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { comparePassword } from "@/lib/auth"; // compare hash
+import { comparePassword } from "@/lib/auth";
+import { SignJWT } from "jose"; // Wajib install: npm install jose
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "http://localhost:3001",
@@ -8,62 +9,47 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
-// Preflight CORS
 export async function OPTIONS() {
   return NextResponse.json({}, { headers: corsHeaders });
 }
 
-// Login user
-export async function POST(request: NextRequest): Promise<Response> {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { email, password } = body;
 
-    // Validasi field wajib
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email dan password harus diisi" },
-        { status: 400, headers: corsHeaders }
-      );
-    }
-
-    // Cek user di database
-    const user = await prisma.user.findUnique({
-      where: { email },
-      select: { id: true, email: true, password: true, name: true, role: true },
-    });
+    const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "Email tidak terdaftar" },
-        { status: 404, headers: corsHeaders }
-      );
+      return NextResponse.json({ error: "Email tidak terdaftar" }, { status: 404, headers: corsHeaders });
     }
 
-    // Compare password
     const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
-      return NextResponse.json(
-        { error: "Password salah" },
-        { status: 401, headers: corsHeaders }
-      );
+      return NextResponse.json({ error: "Password salah" }, { status: 401, headers: corsHeaders });
     }
 
-    // Hapus password sebelum kirim ke frontend
-    const { password: _, ...userWithoutPassword } = user;
+    // ✅ FIX: Buat Token JWT (PENTING!)
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET || "rahasia-negara");
+    const token = await new SignJWT({ userId: user.id, role: user.role })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("7d")
+      .sign(secret);
 
-    // Kembalikan user info → frontend simpan di localStorage
+    // ✅ FIX ESLint: Buat object baru agar tidak perlu destructuring user.password yang unused
+    const userData = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role
+    };
+
     return NextResponse.json(
-      { message: "Login berhasil", user: userWithoutPassword },
+      { message: "Login berhasil", token, user: userData },
       { status: 200, headers: corsHeaders }
     );
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Login error:", error.message);
-    }
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500, headers: corsHeaders }
-    );
+  } catch (error) {
+    console.error("Login error:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500, headers: corsHeaders });
   }
 }

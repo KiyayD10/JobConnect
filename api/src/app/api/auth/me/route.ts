@@ -1,55 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { authenticateRequest } from "@/middleware";
+// ✅ FIX: Import dari @/lib/auth (bukan middleware)
+import { authenticateRequest } from "@/lib/auth"; 
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export async function GET(request: NextRequest) {
     try {
-        // Autentikasi user
-        const auth = authenticateRequest(request)
-        if (auth.error) {
-            return auth.error
-        }
+        // ✅ FIX: Tambahkan 'await' karena verifikasi token itu async
+        const auth = await authenticateRequest(request);
+        if (auth.error) return auth.error;
 
-        const { user } = auth
+        const { user } = auth;
 
-        // Ambil data dari User dan Relasi Jobs dari database
         const userData = await prisma.user.findUnique({
             where: { id: user.userId },
             select: {
-                id: true,
-                email: true,
-                name: true,
-                role: true,
-                createdAt: true,
-                updatedAt: true,
-                // Relasi job diurutkan dari yang terbaru
-                jobs: {
-                    orderBy: {
-                        createdAt: 'desc'
-                    },
-                },
+                id: true, email: true, name: true, role: true, createdAt: true,
+                jobs: { orderBy: { createdAt: 'desc' } },
             },
-        })
+        });
 
-        // Validasi kalau user dihapus saat sesi masih aktif
-        if (!userData) {
-            return NextResponse.json(
-                { error: "User tidak ditemukan" }, 
-                { status: 404 }
-            )
-        }
+        if (!userData) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-        // kembalikan data user
-        return NextResponse.json({ 
-            user: userData, 
-        })
-    } catch (error: unknown) {
-        if (error instanceof Error) {
-            console.error("Gagal mengambil data profil pengguna:", error.message);
-        }
-        return NextResponse.json(
-            {error: "Terjadi kesalahan pada server"},
-            {status: 500}
-        )
+        return NextResponse.json({ user: userData });
+    } catch (error) {
+        console.error("Profile error:", error);
+        return NextResponse.json({ error: "Server Error" }, { status: 500 });
     }
 }
