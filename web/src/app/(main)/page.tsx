@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// 1. IMPORT AXIOS YANG SUDAH KITA BUAT
 import api from "@/src/lib/axios"; 
 import { Search, MapPin, Briefcase, Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/src/components/ui/button";
 
-// ... (Interface Job tetap sama)
 
 export default function HomePage() {
   const [jobs, setJobs] = useState<Job[]>([]);
