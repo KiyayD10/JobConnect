@@ -34,6 +34,20 @@ export default function EditJobPage() {
       }
     }
     if (id) fetchJobData();
+
+    const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await api.put(`/jobs/${id}`, formData);
+      toast.success("Berhasil memperbarui lowongan");
+      router.push("/dashboard/employer");
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Gagal update");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   }, [id, router]);
     return (
         <div>
