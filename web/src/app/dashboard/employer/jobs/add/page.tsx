@@ -40,9 +40,11 @@ export default function AddJobPage() {
   });
 
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Tambahkan state loading
 
+  // Proteksi Halaman
   if (!user || user.role !== "EMPLOYER") {
-    router.push("/auth/login");
+    if (typeof window !== "undefined") router.push("/auth/login");
     return null;
   }
 
@@ -68,17 +70,26 @@ export default function AddJobPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!validateForm()) {
       toast.error("Harap lengkapi semua field yang wajib diisi!");
       return;
     }
 
+    setIsLoading(true);
     try {
-      await api.post("/jobs", { ...form, userId: user.id });
+      // PERBAIKAN: userId tidak perlu dikirim di body karena sudah ada di Token
+      // Axios 'api' Anda seharusnya sudah menyertakan header Authorization secara otomatis
+      await api.post("/jobs", form); 
+      
       toast.success("Lowongan berhasil ditambahkan!");
       router.push("/dashboard/employer/jobs");
-    } catch (error) {
-      toast.error("Gagal menambahkan lowongan.");
+      router.refresh(); // Pastikan data terbaru di-fetch ulang
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.error || "Gagal menambahkan lowongan.";
+      toast.error(errorMsg);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -86,7 +97,7 @@ export default function AddJobPage() {
     <div className={styles.dbContainer}>
       <div className={styles.contentWrapper}>
         <div className="mb-8">
-          <h1 className={styles.dbTitle}>Tambah Lowongan Kerja</h1>
+          <h1 className={styles.pageTitle}>Tambah Lowongan Kerja</h1>
           <p className="text-gray-600">Isi detail lowongan kerja yang ingin Anda buka</p>
         </div>
 
@@ -101,6 +112,7 @@ export default function AddJobPage() {
                 onChange={(e) => handleChange("title", e.target.value)}
                 className={`${styles.inputField} ${errors.title ? styles.inputError : ""}`}
                 placeholder="Contoh: Frontend Developer"
+                disabled={isLoading}
               />
               {errors.title && <p className={styles.errorText}>Judul harus diisi</p>}
             </div>
@@ -113,6 +125,7 @@ export default function AddJobPage() {
                 value={form.company}
                 onChange={(e) => handleChange("company", e.target.value)}
                 className={`${styles.inputField} ${errors.company ? styles.inputError : ""}`}
+                disabled={isLoading}
               />
             </div>
 
@@ -124,6 +137,7 @@ export default function AddJobPage() {
                 value={form.location}
                 onChange={(e) => handleChange("location", e.target.value)}
                 className={`${styles.inputField} ${errors.location ? styles.inputError : ""}`}
+                disabled={isLoading}
               />
             </div>
 
@@ -132,8 +146,9 @@ export default function AddJobPage() {
               <label className={styles.label}>Tipe Pekerjaan <span className="text-red-500">*</span></label>
               <button
                 type="button"
-                onClick={() => setShowTypeDropdown(!showTypeDropdown)}
+                onClick={() => !isLoading && setShowTypeDropdown(!showTypeDropdown)}
                 className={styles.dropdownButton}
+                disabled={isLoading}
               >
                 <span>{form.type ? jobTypes.find(t => t.value === form.type)?.label : "Pilih Tipe"}</span>
                 {showTypeDropdown ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
@@ -156,7 +171,7 @@ export default function AddJobPage() {
               )}
             </div>
 
-            {/* GAJI (Field Baru) */}
+            {/* GAJI (Sesuai Schema String) */}
             <div className={styles.inputGroup}>
               <label className={styles.label}>Gaji (Opsional)</label>
               <input
@@ -164,7 +179,8 @@ export default function AddJobPage() {
                 value={form.salary}
                 onChange={(e) => handleChange("salary", e.target.value)}
                 className={styles.inputField}
-                placeholder="Contoh: Rp 8.000.000 - Rp 12.000.000"
+                placeholder="Contoh: Rp 8jt - 12jt atau Negosiasi"
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -178,11 +194,12 @@ export default function AddJobPage() {
               className={`${styles.textArea} ${errors.description ? styles.inputError : ""}`}
               rows={4}
               placeholder="Jelaskan tanggung jawab pekerjaan..."
+              disabled={isLoading}
             />
             {errors.description && <p className={styles.errorText}>Deskripsi harus diisi</p>}
           </div>
 
-          {/* PERSYARATAN (Field Baru) */}
+          {/* PERSYARATAN */}
           <div className={styles.inputGroup}>
             <label className={styles.label}>Persyaratan <span className="text-red-500">*</span></label>
             <textarea
@@ -191,17 +208,27 @@ export default function AddJobPage() {
               className={`${styles.textArea} ${errors.requirements ? styles.inputError : ""}`}
               rows={4}
               placeholder="Skill, pengalaman, atau latar belakang pendidikan..."
+              disabled={isLoading}
             />
             {errors.requirements && <p className={styles.errorText}>Persyaratan harus diisi</p>}
           </div>
 
           {/* Tombol Aksi */}
           <div className={styles.btnActionGroup}>
-            <button type="button" onClick={() => router.back()} className={styles.btnSecondary}>
+            <button 
+              type="button" 
+              onClick={() => router.back()} 
+              className={styles.btnSecondary}
+              disabled={isLoading}
+            >
               Batal
             </button>
-            <button type="submit" className={styles.btnPost}>
-              Simpan Lowongan
+            <button 
+              type="submit" 
+              className={styles.btnPost}
+              disabled={isLoading}
+            >
+              {isLoading ? "Menyimpan..." : "Simpan Lowongan"}
             </button>
           </div>
         </form>

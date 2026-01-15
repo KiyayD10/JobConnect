@@ -1,21 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+// 1. IMPORT AXIOS YANG SUDAH KITA BUAT
+import api from "@/src/lib/axios"; 
 import { Search, MapPin, Briefcase, Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/src/components/ui/button";
-import "@/src/app/globals.css"; // Pastikan path file CSS sudah benar
 
-interface Job {
-  id: string;
-  title: string;
-  company: string;
-  location: string;
-  type: string;
-  salary: string | null;
-  createdAt: string;
-}
+// ... (Interface Job tetap sama)
 
 export default function HomePage() {
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -24,9 +17,9 @@ export default function HomePage() {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await fetch("/api/jobs");
-        const data = await res.json();
-        setJobs(data.jobs || []);
+        const res = await api.get("/jobs");
+        
+        setJobs(res.data.jobs || []);
       } catch (error) {
         console.error("Gagal mengambil data jobs:", error);
       } finally {
@@ -42,7 +35,6 @@ export default function HomePage() {
       <nav className="nav-custom">
         <div className="nav-container">
           <Link href="/">
-            {/* Pastikan file logo.png ada di folder /public/images/ */}
             <Image src="/images/logo.png" alt="Logo" width={240} height={60} className="w-auto h-10" />
           </Link>
           
@@ -60,7 +52,6 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* HERO SECTION */}
       <section className="hero-section">
         <div className="hero-badge">
           <Star size={14} fill="currentColor" /> PLATFORM KARIR TERPERCAYA
@@ -83,7 +74,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* JOB LIST */}
       <main className="max-w-7xl mx-auto px-4 py-20">
         <div className="section-header">
            <h2 className="text-3xl font-black">Lowongan Populer</h2>
@@ -119,7 +109,6 @@ export default function HomePage() {
         )}
       </main>
 
-      {/* EMPLOYER BANNER */}
       <section className="max-w-7xl mx-auto px-4 pb-20">
         <div className="employer-banner">
           <h2 className="banner-title">Pasang Lowongan Sekarang</h2>

@@ -1,89 +1,96 @@
-import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { jwtVerify } from "jose";
+import { JobType } from "@prisma/client";
 
-// Helper: Ambil ID dari URL
-function getId(request: NextRequest) {
-  const segments = new URL(request.url).pathname.split("/").filter(Boolean)
-  return segments[segments.length - 1]
-}
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
-
-// Ambil pekerjaan berdasarkan ID
-export async function GET(request: NextRequest) {
+async function getUserFromRequest(request: NextRequest) {
   try {
-    const id = getId(request)
-    if (!id) return NextResponse.json({ error: "ID tidak valid" }, { status: 400 })
-
-    const job = await prisma.job.findUnique({
-      where: { id },
-      include: { user: { select: { id: true, name: true, email: true, role: true } } },
-    })
-
-    if (!job) return NextResponse.json({ error: "Lowongan tidak ditemukan" }, { status: 404 })
-
-    return NextResponse.json(job, { status: 200 })
-  } catch (error) {
-    console.error("GET job by ID error:", error)
-    return NextResponse.json({ error: "Terjadi kesalahan server" }, { status: 500 })
+    const auth = request.headers.get("authorization");
+    if (!auth?.startsWith("Bearer ")) return null;
+    const token = auth.split(" ")[1];
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    
+    // SESUAIKAN: Menggunakan userId
+    return payload as { userId: string; role: string };
+  } catch {
+    return null;
   }
 }
 
-// UPDATE JOB (Hanya Owner/Admin)
+function getId(request: NextRequest) {
+  const segments = new URL(request.url).pathname.split("/").filter(Boolean);
+  return segments[segments.length - 1];
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const id = getId(request);
+    const job = await prisma.job.findUnique({
+      where: { id },
+      include: { user: { select: { id: true, name: true, role: true } } },
+    });
+    if (!job) return NextResponse.json({ error: "Lowongan tidak ditemukan" }, { status: 404 });
+    return NextResponse.json(job);
+  } catch {
+    return NextResponse.json({ error: "Gagal memuat data" }, { status: 500 });
+  }
+}
+
 export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json()
-    const id = getId(request)
-    const { userId, title, company, location, type, salary, description, requirements } = body
+    const user = await getUserFromRequest(request);
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    if (!id || !userId) return NextResponse.json({ error: "ID atau userId tidak valid" }, { status: 400 })
-    if (!title || !company || !location || !description || !requirements) {
-      return NextResponse.json({ error: "Data tidak lengkap" }, { status: 400 })
+    const id = getId(request);
+    const body = await request.json();
+    const existingJob = await prisma.job.findUnique({ where: { id } });
+
+    if (!existingJob) return NextResponse.json({ error: "Lowongan tidak ditemukan" }, { status: 404 });
+
+    // Validasi kepemilikan menggunakan user.userId
+    if (existingJob.userId !== user.userId && user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Akses ditolak" }, { status: 403 });
     }
-
-    const existingJob = await prisma.job.findUnique({ where: { id } })
-    if (!existingJob) return NextResponse.json({ error: "Lowongan tidak ditemukan" }, { status: 404 })
-
-    const isOwner = existingJob.userId === userId
-    const isAdmin = body.role === "ADMIN" 
-
-    if (!isOwner && !isAdmin) return NextResponse.json({ error: "Anda bukan pemilik lowongan ini" }, { status: 403 })
 
     const updatedJob = await prisma.job.update({
       where: { id },
-      data: { title, company, location, type, salary, description, requirements },
-    })
+      data: {
+        title: body.title || existingJob.title,
+        company: body.company || existingJob.company,
+        location: body.location || existingJob.location,
+        type: (body.type as JobType) || existingJob.type,
+        salary: body.salary !== undefined ? String(body.salary) : existingJob.salary,
+        description: body.description || existingJob.description,
+        requirements: String(body.requirements || existingJob.requirements),
+      },
+    });
 
-    return NextResponse.json({ message: "Update sukses", job: updatedJob }, { status: 200 })
-  } catch (error) {
-    console.error("PUT job error:", error)
-    return NextResponse.json({ error: "Terjadi kesalahan server" }, { status: 500 })
+    return NextResponse.json(updatedJob);
+  } catch {
+    return NextResponse.json({ error: "Gagal memperbarui data" }, { status: 500 });
   }
 }
 
-
-// DELETE JOB (Hanya Owner/Admin)
 export async function DELETE(request: NextRequest) {
   try {
-    const body = await request.json()
-    const id = getId(request)
-    const userId = body.userId
-    const role = body.role
+    const user = await getUserFromRequest(request);
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    if (!id || !userId) return NextResponse.json({ error: "ID atau userId tidak valid" }, { status: 400 })
+    const id = getId(request);
+    const existingJob = await prisma.job.findUnique({ where: { id } });
 
-    const existingJob = await prisma.job.findUnique({ where: { id } })
-    if (!existingJob) return NextResponse.json({ error: "Lowongan tidak ditemukan" }, { status: 404 })
+    if (!existingJob) return NextResponse.json({ error: "Lowongan tidak ditemukan" }, { status: 404 });
 
-    const isOwner = existingJob.userId === userId
-    const isAdmin = role === "ADMIN"
+    // Validasi kepemilikan menggunakan user.userId
+    if (existingJob.userId !== user.userId && user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Akses ditolak" }, { status: 403 });
+    }
 
-    if (!isOwner && !isAdmin) return NextResponse.json({ error: "Anda bukan pemilik lowongan ini" }, { status: 403 })
-
-    await prisma.job.delete({ where: { id } })
-
-    return NextResponse.json({ message: "Lowongan berhasil dihapus" }, { status: 200 })
-  } catch (error) {
-    console.error("DELETE job error:", error)
-    return NextResponse.json({ error: "Terjadi kesalahan server" }, { status: 500 })
+    await prisma.job.delete({ where: { id } });
+    return NextResponse.json({ message: "Lowongan berhasil dihapus" });
+  } catch {
+    return NextResponse.json({ error: "Gagal menghapus lowongan" }, { status: 500 });
   }
 }

@@ -6,7 +6,7 @@ import { useAuth } from "@/src/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { Plus, Edit3, Trash2, MapPin, Building2, Briefcase, Clock } from "lucide-react";
 import { toast } from "sonner";
-import styles from "../../dashboard.module.css"; // Menggunakan CSS module yang sama
+import styles from "../../dashboard.module.css";
 
 type JobUser = {
   id: string;
@@ -20,6 +20,8 @@ type Job = {
   company: string;
   location: string;
   type: string;
+  salary?: string;
+  requirements?: string;
   createdAt: string;
   user: JobUser;
 };
@@ -34,18 +36,22 @@ export default function EmployerJobsPage() {
 
   useEffect(() => {
     if (!user) return;
-    if (user.role !== "EMPLOYER") {
-      router.push("/login");
+
+    // Proteksi Role
+    if (user.role !== "EMPLOYER" && user.role !== "ADMIN") {
+      router.push("/auth/login");
       return;
     }
 
     const fetchJobs = async () => {
       try {
+        setLoading(true);
+        // Backend sudah otomatis memfilter job milik user yang login (berdasarkan token)
         const res = await api.get<{ jobs: Job[] }>("/jobs");
-        const myJobs = res.data.jobs.filter((job) => job.user.id === user.id);
-        setJobs(myJobs);
-      } catch (err) {
+        setJobs(res.data.jobs);
+      } catch (err: any) {
         setError("Gagal mengambil data lowongan");
+        toast.error("Sesi berakhir atau gagal memuat data.");
       } finally {
         setLoading(false);
       }
@@ -55,17 +61,18 @@ export default function EmployerJobsPage() {
   }, [user, router]);
 
   const handleDelete = async (id: string) => {
-    if (!user) return;
     if (!confirm("Apakah Anda yakin ingin menghapus lowongan ini?")) return;
 
     try {
-      await api.delete(`/jobs/${id}`, {
-        data: { userId: user.id, role: user.role },
-      });
+      // PERBAIKAN: Cukup kirim DELETE ke ID. 
+      // Backend akan mengecek Token Anda untuk ijin penghapusan.
+      await api.delete(`/jobs/${id}`);
+      
       setJobs((prev) => prev.filter((job) => job.id !== id));
       toast.success("Lowongan berhasil dihapus");
-    } catch (err) {
-      toast.error("Gagal menghapus lowongan");
+    } catch (err: any) {
+      const msg = err.response?.data?.error || "Gagal menghapus lowongan";
+      toast.error(msg);
     }
   };
 
@@ -92,12 +99,15 @@ export default function EmployerJobsPage() {
 
         {/* Content Section */}
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '4rem', background: 'white', borderRadius: '1rem' }}>
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-500">Memuat data lowongan...</p>
+          <div className="flex flex-col items-center justify-center p-16 bg-white rounded-2xl shadow-sm">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
+            <p className="text-gray-500 font-medium">Memuat data lowongan...</p>
           </div>
         ) : error ? (
-          <div className={styles.errorText} style={{ textAlign: 'center', padding: '2rem' }}>{error}</div>
+          <div className="text-center p-10 bg-red-50 text-red-600 rounded-xl border border-red-100">
+            <p>{error}</p>
+            <button onClick={() => window.location.reload()} className="mt-4 underline">Coba lagi</button>
+          </div>
         ) : jobs.length === 0 ? (
           <div className={styles.formCard} style={{ textAlign: 'center', padding: '4rem' }}>
             <Briefcase size={48} className="mx-auto text-gray-300 mb-4" />
@@ -114,14 +124,14 @@ export default function EmployerJobsPage() {
                 <div className={styles.jobInfo}>
                   <h3 className="text-xl font-bold text-gray-900">{job.title}</h3>
                   <div className={styles.jobMeta}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Building2 size={16} /> {job.company}
+                    <span className="flex items-center gap-1">
+                      <Building2 size={16} className="text-gray-400" /> {job.company}
                     </span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <MapPin size={16} /> {job.location}
+                    <span className="flex items-center gap-1">
+                      <MapPin size={16} className="text-gray-400" /> {job.location}
                     </span>
                     <div className={styles.badge}>
-                      <Clock size={14} /> {job.type.replace("_", " ")}
+                      <Clock size={14} /> {job.type.replace("_", " ").toLowerCase()}
                     </div>
                   </div>
                 </div>
