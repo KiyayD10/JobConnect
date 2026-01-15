@@ -2,22 +2,21 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/src/context/AuthContext";
 import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
 import Link from "next/link";
-import axios from "axios";
 import api from "@/src/lib/axios";
+import { toast } from "sonner";
+import styles from "../auth.module.css";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { login } = useAuth();
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [role, setRole] = useState<"JOBSEEKER" | "EMPLOYER">("JOBSEEKER");
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+
+async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault();
   setIsLoading(true);
   setError("");
@@ -27,67 +26,62 @@ export default function RegisterPage() {
   const payload = { ...data, role };
 
   try {
-    const res = await api.post("/auth/register", payload);
+    await api.post("/auth/register", payload);
+    toast.success("Registrasi Berhasil!", {
+      description: "Silakan masuk dengan akun yang baru saja dibuat.",
+    });
 
-    // ⬇️ LOGIN LANGSUNG (USER + TOKEN)
-    login(res.data.user, res.data.token);
-
-    const roleUser = res.data.user.role;
-    console.log("Redirecting role:", roleUser);
-
-    if (roleUser === "JOBSEEKER") router.push("/dashboard/jobseeker");
-    else if (roleUser === "EMPLOYER") router.push("/dashboard/employer");
-    else if (roleUser === "ADMIN") router.push("/dashboard/admin");
-    else router.push("/auth/login");
+    router.push(`/auth/login?email=${encodeURIComponent(data.email as string)}`);
 
   } catch (err: any) {
-    console.error(err);
-    setError(err.response?.data?.error || "Registration failed");
+    const errorMsg = err.response?.data?.error || "Pendaftaran gagal";
+    toast.error(errorMsg);
+    setError(errorMsg);
   } finally {
     setIsLoading(false);
   }
 }
 
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">Buat Akun</h2>
-          <p className="mt-2 text-sm text-gray-600">Daftar sebagai pencari kerja atau perusahaan</p>
+ return (
+  <div className={styles.wrapper}>
+    <div className={styles.card}>
+      <div className={styles.formHeader}>
+        <h2 className={styles.title}>Buat Akun</h2>
+        <p className={styles.subtitle}>Daftar sebagai pencari kerja atau perusahaan</p>
+      </div>
+
+      {error && <div className={styles.error}>{error}</div>}
+
+      <form className={styles.form} onSubmit={onSubmit}>
+        <Input name="name" placeholder="Nama Lengkap" required />
+        <Input name="email" type="email" placeholder="Email" required />
+        <Input name="password" type="password" placeholder="Password" required minLength={6} />
+
+        <div className={styles.selectGroup}>
+          <label className={styles.label}>Daftar sebagai</label>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value as any)}
+            className={styles.select}
+          >
+            <option value="JOBSEEKER">Pencari Kerja</option>
+            <option value="EMPLOYER">Perusahaan / Recruiter</option>
+          </select>
         </div>
 
-        {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">{error}</div>}
+        <Button type="submit" isLoading={isLoading}>
+          Daftar Sekarang
+        </Button>
 
-        <form className="space-y-6" onSubmit={onSubmit}>
-          <Input name="name" placeholder="Nama Lengkap" required />
-          <Input name="email" type="email" placeholder="Email" required />
-          <Input name="password" type="password" placeholder="Password" required minLength={6} />
-
-          <div>
-            <label className="text-sm font-medium text-gray-700">Daftar sebagai</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value as "JOBSEEKER" | "EMPLOYER")}
-              className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="JOBSEEKER">Pencari Kerja</option>
-              <option value="EMPLOYER">Perusahaan / Recruiter</option>
-            </select>
-          </div>
-
-          <Button type="submit" className="w-full" isLoading={isLoading}>
-            Daftar Sekarang
-          </Button>
-
-          <p className="text-center text-sm text-gray-600">
-            Sudah punya akun?{" "}
-            <Link href="/auth/login" className="font-medium text-indigo-600 hover:underline">
-              Masuk di sini
-            </Link>
-          </p>
-        </form>
-      </div>
+        <p className={styles.footerText}>
+          Sudah punya akun?{" "}
+          <Link href="/auth/login" className={styles.link}>
+            Masuk di sini
+          </Link>
+        </p>
+      </form>
     </div>
-  );
+  </div>
+);
 }
