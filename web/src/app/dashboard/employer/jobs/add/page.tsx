@@ -127,6 +127,7 @@ export default function AddJobPage() {
                 className={`${styles.inputField} ${errors.company ? styles.inputError : ""}`}
                 disabled={isLoading}
               />
+              {errors.company && <p className={styles.errorText}>Perusahaan harus diisi</p>}
             </div>
 
             {/* Lokasi */}
@@ -139,6 +140,7 @@ export default function AddJobPage() {
                 className={`${styles.inputField} ${errors.location ? styles.inputError : ""}`}
                 disabled={isLoading}
               />
+              {errors.location && <p className={styles.errorText}>Lokasi harus diisi</p>}
             </div>
 
             {/* Tipe Pekerjaan */}

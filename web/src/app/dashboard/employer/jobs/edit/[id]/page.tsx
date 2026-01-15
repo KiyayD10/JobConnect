@@ -6,7 +6,7 @@ import api from '@/src/lib/axios';
 import { toast } from 'sonner';
 import { useAuth } from "@/src/context/AuthContext";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import styles from "../../../dashboard.module.css";
+import styles from "../../../../dashboard.module.css";
 
 const jobTypes = [
     { value: "FULLTIME", label: "Full Time" },
@@ -144,6 +144,7 @@ export default function EditJobPage() {
                                     className={`${styles.inputField} ${errors.company ? styles.inputError : ""}`}
                                     disabled={isLoading}
                                 />
+                                {errors.company && <p className={styles.errorText}>Perusahaan harus diisi</p>}
                             </div>
 
                             <div className={styles.inputGroup}>
@@ -155,6 +156,7 @@ export default function EditJobPage() {
                                     className={`${styles.inputField} ${errors.location ? styles.inputError : ""}`}
                                     disabled={isLoading}
                                 />
+                                {errors.location && <p className={styles.errorText}>Lokasi harus diisi</p>}
                             </div>
 
                             <div className={styles.inputGroup} style={{ position: 'relative' }}>
@@ -207,6 +209,7 @@ export default function EditJobPage() {
                                 rows={4}
                                 disabled={isLoading}
                             />
+                            {errors.description && <p className={styles.errorText}>Deskripsi harus diisi</p>}
                         </div>
 
                         <div className={styles.inputGroup}>
@@ -218,6 +221,7 @@ export default function EditJobPage() {
                                 rows={4}
                                 disabled={isLoading}
                             />
+                            {errors.requirements && <p className={styles.errorText}>Persyaratan harus diisi</p>}
                         </div>
 
                         <div className={styles.btnActionGroup}>
