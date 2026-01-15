@@ -4,6 +4,14 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import api from '@/src/lib/axios';
 import { toast } from 'sonner';
+
+const jobTypes = [
+  { value: "FULLTIME", label: "Full Time" },
+  { value: "PARTTIME", label: "Part Time" },
+  { value: "INTERNSHIP", label: "Internship" },
+  { value: "FREELANCE", label: "Freelance" },
+  { value: "CONTRACT", label: "Contract" },
+];
 export default function EditJobPage() {
     const router = useRouter();
     const params = useParams();
