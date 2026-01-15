@@ -1,34 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { Prisma, JobType } from "@prisma/client"
-import { jwtVerify } from "jose"
-
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!)
-
-async function getUserFromRequest(request: NextRequest) {
-  const auth = request.headers.get("authorization")
-  if (!auth) return null
-
-  const token = auth.split(" ")[1]
-  const { payload } = await jwtVerify(token, JWT_SECRET)
-
-  return payload as {
-    id: string
-    role: string
-    name: string
-  }
-}
-
 
 
 // Ambil pekerjaan
 export async function GET(request: NextRequest) {
   try {
-    const user = await getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
     const { searchParams } = new URL(request.url)
     const type = searchParams.get("type")
     const location = searchParams.get("location")
@@ -37,9 +14,14 @@ export async function GET(request: NextRequest) {
     const where: Prisma.JobWhereInput = {}
 
     if (type) where.type = type as JobType
+
     if (location) {
-      where.location = { contains: location, mode: "insensitive" }
+      where.location = {
+        contains: location,
+        mode: "insensitive",
+      }
     }
+
     if (search) {
       where.OR = [
         { title: { contains: search, mode: "insensitive" } },
@@ -48,23 +30,22 @@ export async function GET(request: NextRequest) {
       ]
     }
 
-    // 🔐 KHUSUS EMPLOYER
-    if (user.role === "EMPLOYER") {
-      where.userId = user.id
-    }
-
     const jobs = await prisma.job.findMany({
       where,
       include: {
         user: {
-          select: { id: true, name: true, role: true },
+          select: {
+            id: true,
+            name: true,
+            role: true,
+          },
         },
       },
       orderBy: { createdAt: "desc" },
     })
 
     return NextResponse.json({ jobs })
-  } catch {
+  } catch  {
     return NextResponse.json(
       { error: "Gagal mengambil data job" },
       { status: 500 }
@@ -72,19 +53,9 @@ export async function GET(request: NextRequest) {
   }
 }
 
-
 // Buat pekerjaan
 export async function POST(request: NextRequest) {
   try {
-    const user = await getUserFromRequest(request)
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    if (user.role !== "EMPLOYER") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-    }
-
     const body = await request.json()
     const {
       title,
@@ -94,9 +65,10 @@ export async function POST(request: NextRequest) {
       salary,
       description,
       requirements,
+      userId, 
     } = body
 
-    if (!title || !company || !location || !description || !requirements) {
+    if (!title || !company || !location || !description || !requirements || !userId) {
       return NextResponse.json(
         { error: "Data tidak lengkap" },
         { status: 400 }
@@ -112,7 +84,7 @@ export async function POST(request: NextRequest) {
         salary: salary || null,
         description,
         requirements,
-        userId: user.id, // 🔐 AMAN
+        userId,
       },
     })
 
