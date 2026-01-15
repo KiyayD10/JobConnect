@@ -1,16 +1,26 @@
 .header {
-    top: 0;
+  top: 0;
   width: 100%;
-  height: 64px;
   padding: 0 32px;
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
-position: fixed;
+  position: fixed;
+  display: flex;
+  align-items: center;
+  z-index: 100;
+  height: 70px;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  
+}
+.headerContent {
+  width: 100%;
+  max-width: 1200px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  z-index: 50;
-  
+  padding: 0 1.5rem;
 }
 
 /* KIRI */
@@ -23,30 +33,83 @@ position: fixed;
 /* MENU */
 .nav {
   display: flex;
-  gap: 100px;
+  gap: 5rem;
 }
 
 .nav a {
   text-decoration: none;
-  color: #374151;
-  font-weight: 500;
+  color: #4b5563;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: color 0.2s;
 }
 
 .nav a:hover {
   color: #4f46e5;
 }
 
-/* KANAN */
-.logout {
-  background: transparent;
+.logoutDesktop {
+  background: #ef4444;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
   border: none;
-  font-weight: 600;
-  color: #dc2626;
   cursor: pointer;
 }
 
 .logout:hover {
   text-decoration: underline;
+}
+
+.mobileMenuBtn {
+  display: none; /* Sembunyi di desktop */
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #374151;
+}
+
+.logoutMobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobileMenuBtn {
+    display: block; /* Munculkan tombol hamburger */
+  }
+
+  .logoutDesktop {
+    display: none; /* Sembunyikan tombol logout samping */
+  }
+
+  .nav {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    background: white;
+    flex-direction: column; /* Menu jadi vertikal */
+    padding: 1.5rem;
+    gap: 1.5rem;
+    border-bottom: 2px solid #f3f4f6;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    display: none; /* Sembunyi sebelum diklik */
+  }
+
+  .navOpen {
+    display: flex; /* Muncul saat isMenuOpen true */
+  }
+
+  .logoutMobile {
+    display: block;
+    width: 100%;
+    background: #ef4444;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: none;
+  }
 }
 
 /* Konten dashboard */
@@ -235,8 +298,6 @@ position: fixed;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-/* Tambahkan ke dashboard.module.css */
-
 .jobList {
   display: flex;
   flex-direction: column;
@@ -327,7 +388,6 @@ position: fixed;
   .jobItem { flex-direction: column; align-items: flex-start; }
   .actionButtons { width: 100%; border-top: 1px solid #f1f5f9; pt: 1rem; mt: 0.5rem; }
 }
-/* dashboard.module.css */
 
 .headerSection {
   display: flex;
