@@ -19,12 +19,29 @@ export default function EmployerLayout({
   useEffect(() => {
     if (loading) return;
 
-    if (!user || user.role !== "EMPLOYER") {
+    if (!user) {
+      router.replace("/auth/login");
+      return;
+    }
+
+    if (user.role !== "EMPLOYER") {
       router.replace("/auth/login");
     }
   }, [user, loading, router]);
 
-  if (loading || !user) return null;
+  // 🔄 Loading state (hindari blank screen)
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  // ⛔ Jangan render layout jika bukan employer
+  if (!user || user.role !== "EMPLOYER") {
+    return null;
+  }
 
   const handleLogout = () => {
     logout();

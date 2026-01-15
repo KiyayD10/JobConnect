@@ -16,36 +16,36 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+  e.preventDefault();
+  setIsLoading(true);
+  setError("");
 
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
+  const formData = new FormData(e.currentTarget);
+  const data = Object.fromEntries(formData.entries());
 
-    try {
-      // POST ke API login menggunakan axios
-      const res = await api.post("/auth/login", data);
+  try {
+    const res = await api.post("/auth/login", data);
 
-      // simpan user ke context
-      await login(res.data.user);
+    // ⬇️ SIMPAN KE AUTH CONTEXT (USER + TOKEN)
+    login(res.data.user, res.data.token);
 
-      // redirect sesuai role
-      const role = res.data.user.role;
-      console.log("Redirecting role:", role);
+    // redirect sesuai role
+    const role = res.data.user.role;
+    console.log("Redirecting role:", role);
 
-      if (role === "JOBSEEKER") router.push("/dashboard/jobseeker");
-      else if (role === "EMPLOYER") router.push("/dashboard/employer");
-      else if (role === "ADMIN") router.push("/dashboard/admin");
-      else router.push("/auth/login"); // fallback
+    if (role === "JOBSEEKER") router.push("/dashboard/jobseeker");
+    else if (role === "EMPLOYER") router.push("/dashboard/employer");
+    else if (role === "ADMIN") router.push("/dashboard/admin");
+    else router.push("/auth/login");
 
-    } catch (err: any) {
-      console.error(err);
-      setError(err.response?.data?.error || "Login gagal");
-    } finally {
-      setIsLoading(false);
-    }
+  } catch (err: any) {
+    console.error(err);
+    setError(err.response?.data?.error || "Login gagal");
+  } finally {
+    setIsLoading(false);
   }
+}
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">

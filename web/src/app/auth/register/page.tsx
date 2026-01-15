@@ -18,37 +18,36 @@ export default function RegisterPage() {
   const [role, setRole] = useState<"JOBSEEKER" | "EMPLOYER">("JOBSEEKER");
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+  e.preventDefault();
+  setIsLoading(true);
+  setError("");
 
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
-    const payload = { ...data, role };
+  const formData = new FormData(e.currentTarget);
+  const data = Object.fromEntries(formData.entries());
+  const payload = { ...data, role };
 
-    try {
-      // Gunakan relative path untuk internal API Next.js
-      const res = await api.post("/auth/register", payload);
+  try {
+    const res = await api.post("/auth/register", payload);
 
-       // login user
-  await login(res.data.user);
+    // ⬇️ LOGIN LANGSUNG (USER + TOKEN)
+    login(res.data.user, res.data.token);
 
-  // redirect sesuai role
-  const role = res.data.user.role;
-  console.log("Redirecting role:", role);
+    const roleUser = res.data.user.role;
+    console.log("Redirecting role:", roleUser);
 
-  if (role === "JOBSEEKER") router.push("/dashboard/jobseeker");
-  else if (role === "EMPLOYER") router.push("/dashboard/employer");
-  else if (role === "ADMIN") router.push("/dashboard/admin");
-  else router.push("/auth/login"); // fallback
-} catch (err: any) {
-  console.error(err);
-  setError(err.response?.data?.error || "Registration failed");
+    if (roleUser === "JOBSEEKER") router.push("/dashboard/jobseeker");
+    else if (roleUser === "EMPLOYER") router.push("/dashboard/employer");
+    else if (roleUser === "ADMIN") router.push("/dashboard/admin");
+    else router.push("/auth/login");
 
-    } finally {
-      setIsLoading(false);
-    }
+  } catch (err: any) {
+    console.error(err);
+    setError(err.response?.data?.error || "Registration failed");
+  } finally {
+    setIsLoading(false);
   }
+}
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
